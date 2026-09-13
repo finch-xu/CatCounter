@@ -85,9 +85,16 @@ function fmt(ts: number | null): string {
   return ts ? new Date(ts * 1000).toLocaleString('zh-CN') : '从未';
 }
 
+/** 空输入表示不修改该项 */
+function toCounter(s: string): number | undefined {
+  return s.trim() === '' ? undefined : Number(s);
+}
+
 async function saveSiteCounters() {
+  const c = { pv: toCounter(sitePv.value), uv: toCounter(siteUv.value) };
+  if (c.pv === undefined && c.uv === undefined) { toast('请至少填写一项', 'error'); return; }
   try {
-    const site = await api.setSiteCounters(props.site.id, { pv: Number(sitePv.value), uv: Number(siteUv.value) });
+    const site = await api.setSiteCounters(props.site.id, c);
     emit('updated', site);
     toast('已更新站点计数');
   } catch (e) { fail(e); }
@@ -100,8 +107,10 @@ function pick(p: PageRow) {
 }
 async function savePageCounters() {
   if (!editPath.value.trim()) return;
+  const c = { pv: toCounter(editPv.value), uv: toCounter(editUv.value) };
+  if (c.pv === undefined && c.uv === undefined) { toast('请至少填写一项', 'error'); return; }
   try {
-    await api.setPageCounters(props.site.id, editPath.value.trim(), { pv: Number(editPv.value), uv: Number(editUv.value) });
+    await api.setPageCounters(props.site.id, editPath.value.trim(), c);
     toast('已更新页面计数');
     await searchPages();
   } catch (e) { fail(e); }
