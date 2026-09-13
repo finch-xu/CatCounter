@@ -35,7 +35,8 @@ onMounted(load);
   <div v-if="data" class="content">
     <div class="grid-stats">
       <StatTile label="站点" :value="data.totals.sites" />
-      <StatTile label="今日 PV" :value="data.totals.today.pv" :sub="`UV ${data.totals.today.uv}`" />
+      <StatTile label="今日 PV" :value="data.totals.today.pv" />
+      <StatTile label="今日 UV" :value="data.totals.today.uv" />
       <StatTile label="累计 PV" :value="data.totals.all.pv" />
       <StatTile label="累计 UV" :value="data.totals.all.uv" />
     </div>
