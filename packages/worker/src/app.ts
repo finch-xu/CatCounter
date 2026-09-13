@@ -1,7 +1,13 @@
 import { Hono } from 'hono';
+import { ensureSchema } from './db/schema';
 import type { Env } from './env';
 
 export const app = new Hono<{ Bindings: Env }>();
+
+app.use('*', async (c, next) => {
+  await ensureSchema(c.env.DB);
+  await next();
+});
 
 app.get('/api/health', (c) => c.json({ ok: true }));
 
