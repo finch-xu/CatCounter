@@ -1,8 +1,12 @@
 import { normalizePath, type CountsResponse, type HitRequest, type HitResponse } from '@catcounter/shared';
 
 export function endpointFromScript(src: string): string {
-  const u = new URL(src);
-  return u.origin + u.pathname.replace(/\/[^/]*$/, '');
+  try {
+    const u = new URL(src);
+    return u.origin + u.pathname.replace(/\/[^/]*$/, '');
+  } catch {
+    return '';
+  }
 }
 
 export function collectListPaths(root: ParentNode): string[] {

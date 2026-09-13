@@ -13,6 +13,7 @@ declare global {
   const token = script.getAttribute('data-token') || '';
   if (!token) return;
   const endpoint = endpointFromScript(script.src);
+  if (!endpoint) return;
   const noHit = script.hasAttribute('data-no-hit');
   const forcedPath = script.getAttribute('data-path');
 

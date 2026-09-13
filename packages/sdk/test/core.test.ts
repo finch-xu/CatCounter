@@ -11,6 +11,11 @@ describe('endpointFromScript', () => {
     expect(endpointFromScript('https://c.example.com/catcounter.js')).toBe('https://c.example.com');
     expect(endpointFromScript('https://c.example.com/catcounter.js?v=1')).toBe('https://c.example.com');
   });
+
+  it('returns empty string for an unparseable src', () => {
+    expect(endpointFromScript('')).toBe('');
+    expect(endpointFromScript('not a url')).toBe('');
+  });
 });
 
 describe('collectListPaths', () => {
