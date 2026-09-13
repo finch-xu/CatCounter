@@ -1,9 +1,9 @@
-import { normalizePath } from '@catcounter/shared';
+import { normalizePath, type CountsResponse } from '@catcounter/shared';
 import { collectListPaths, endpointFromScript, fetchCounts, fillCounts, sendHit } from './core';
 
 declare global {
   interface Window {
-    CatCounter?: { refresh: (path?: string) => Promise<void>; counts: typeof fetchCounts };
+    CatCounter?: { refresh: (path?: string) => Promise<void>; counts: (paths: string[]) => Promise<CountsResponse | null> };
   }
 }
 
