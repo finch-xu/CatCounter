@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted } from 'vue';
-defineProps<{ open: boolean; title: string; wide?: boolean }>();
+const props = defineProps<{ open: boolean; title: string; wide?: boolean }>();
 const emit = defineEmits<{ close: [] }>();
 function onKey(e: KeyboardEvent) {
-  if (e.key === 'Escape') emit('close');
+  if (!props.open || e.key !== 'Escape') return;
+  emit('close');
 }
 onMounted(() => window.addEventListener('keydown', onKey));
 onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
