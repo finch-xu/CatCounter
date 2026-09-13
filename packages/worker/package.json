@@ -1,0 +1,19 @@
+{
+  "name": "@catcounter/worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@catcounter/shared": "workspace:*",
+    "hono": "^4.13.7"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.1.8",
+    "@cloudflare/workers-types": "^5.20260911.1",
+    "typescript": "5.9.3",
+    "vitest": "^4.1.11"
+  }
+}

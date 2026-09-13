@@ -145,3 +145,9 @@ vite.config.ts.timestamp-*
 # 本地设计文档，不公开
 docs/
 .superpowers/
+
+node_modules/
+dist/
+.wrangler/
+packages/worker/assets/*
+!packages/worker/assets/.gitkeep

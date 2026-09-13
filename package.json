@@ -1,0 +1,16 @@
+{
+  "name": "catcounter",
+  "private": true,
+  "packageManager": "pnpm@10.32.1",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "pnpm --filter @catcounter/sdk build && pnpm --filter @catcounter/admin build",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "wrangler": "^4.131.1"
+  }
+}
