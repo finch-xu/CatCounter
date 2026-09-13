@@ -3,11 +3,13 @@ import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { normalizePath } from '@catcounter/shared';
 import type { Env } from '../env';
 import { timingSafeEqualStr } from '../lib/crypto';
+import { dayOf } from '../lib/hash';
 import { normalizeOrigin } from '../lib/origin';
 import { createSession, verifySession } from '../lib/session';
 import {
   createSite, deleteSite, getSite, listPages, listSites, setPageCounters, setSiteCounters, updateSite,
 } from '../repo/sites';
+import { addDays, getOverview, getSiteStats } from '../repo/stats';
 import { createToken, listTokens, revokeToken } from '../repo/tokens';
 
 export const adminRoutes = new Hono<{ Bindings: Env }>();
@@ -180,4 +182,24 @@ adminRoutes.post('/sites/:id/tokens', async (c) => {
 adminRoutes.delete('/sites/:id/tokens/:tid', async (c) => {
   const ok = await revokeToken(c.env.DB, c.req.param('id'), c.req.param('tid'), now());
   return ok ? c.json({ ok: true }) : c.json({ error: 'not found' }, 404);
+});
+
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+const MAX_RANGE_DAYS = 366;
+
+adminRoutes.get('/overview', async (c) => {
+  const today = dayOf(now());
+  return c.json(await getOverview(c.env.DB, today, addDays(today, -29)));
+});
+
+adminRoutes.get('/sites/:id/stats', async (c) => {
+  const id = c.req.param('id');
+  if (!(await getSite(c.env.DB, id))) return c.json({ error: 'not found' }, 404);
+  const today = dayOf(now());
+  const to = c.req.query('to') ?? today;
+  const from = c.req.query('from') ?? addDays(to, -29);
+  if (!DAY_RE.test(from) || !DAY_RE.test(to)) return c.json({ error: '日期格式应为 YYYY-MM-DD' }, 400);
+  if (from > to) return c.json({ error: '开始日期不能晚于结束日期' }, 400);
+  if (addDays(from, MAX_RANGE_DAYS) < to) return c.json({ error: '范围最多 366 天' }, 400);
+  return c.json(await getSiteStats(c.env.DB, id, from, to));
 });
