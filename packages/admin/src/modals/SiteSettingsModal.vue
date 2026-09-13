@@ -22,6 +22,7 @@ const retention = ref('');
 // token
 const tokens = ref<Token[]>([]);
 const newTokenName = ref('');
+const shownToken = ref<string | null>(null);
 
 // 计数修正
 const sitePv = ref('');
@@ -44,6 +45,7 @@ watch(() => props.open, async (o) => {
   sitePv.value = String(props.site.pv);
   siteUv.value = String(props.site.uv);
   confirmName.value = '';
+  shownToken.value = null;
   await loadTokens();
 });
 
@@ -80,6 +82,10 @@ async function revoke(t: Token) {
 }
 async function copyToken(t: Token) {
   if (await copyText(snippetFor(t.token))) toast('已复制接入代码');
+  else toast('复制失败，请手动选择代码复制', 'error');
+}
+function toggleShown(t: Token) {
+  shownToken.value = shownToken.value === t.token ? null : t.token;
 }
 function fmt(ts: number | null): string {
   return ts ? new Date(ts * 1000).toLocaleString('zh-CN') : '从未';
@@ -155,6 +161,7 @@ async function remove() {
             <td class="muted">{{ t.revoked_at ? '已吊销' : fmt(t.last_used_at) }}</td>
             <td class="ops">
               <template v-if="!t.revoked_at">
+                <button class="btn btn-sm" @click="toggleShown(t)">显示代码</button>
                 <button class="btn btn-sm" @click="copyToken(t)">复制代码</button>
                 <button class="btn btn-sm btn-danger" @click="revoke(t)">吊销</button>
               </template>
@@ -166,6 +173,7 @@ async function remove() {
         <input v-model="newTokenName" class="input" placeholder="新 token 名称，例如“新主题”" @keyup.enter="addToken" />
         <button class="btn" @click="addToken">创建 token</button>
       </div>
+      <code v-if="shownToken" class="snippet">{{ snippetFor(shownToken) }}</code>
     </div>
 
     <div v-else-if="tab === 'counters'">

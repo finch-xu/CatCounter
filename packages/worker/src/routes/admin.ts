@@ -185,6 +185,12 @@ adminRoutes.delete('/sites/:id/tokens/:tid', async (c) => {
 });
 
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+/** 校验格式，并拒绝格式合法但日历上不存在的日期（例如 2026-02-30 会被 Date 静默滚到 3 月） */
+function isDay(s: string): boolean {
+  if (!DAY_RE.test(s)) return false;
+  const d = new Date(s + 'T00:00:00Z');
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s;
+}
 const MAX_RANGE_DAYS = 366;
 
 adminRoutes.get('/overview', async (c) => {
@@ -198,8 +204,10 @@ adminRoutes.get('/sites/:id/stats', async (c) => {
   const today = dayOf(now());
   const to = c.req.query('to') ?? today;
   const from = c.req.query('from') ?? addDays(to, -29);
-  if (!DAY_RE.test(from) || !DAY_RE.test(to)) return c.json({ error: '日期格式应为 YYYY-MM-DD' }, 400);
+  if (!isDay(from) || !isDay(to)) return c.json({ error: '日期格式应为 YYYY-MM-DD' }, 400);
   if (from > to) return c.json({ error: '开始日期不能晚于结束日期' }, 400);
   if (addDays(from, MAX_RANGE_DAYS - 1) < to) return c.json({ error: '范围最多 366 天' }, 400);
   return c.json(await getSiteStats(c.env.DB, id, from, to));
 });
+
+adminRoutes.all('*', (c) => c.json({ error: 'not found' }, 404));

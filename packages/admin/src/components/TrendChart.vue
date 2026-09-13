@@ -55,6 +55,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   ro?.disconnect();
   chart?.dispose();
+  chart = null;
 });
 watch(() => props.series, render, { deep: true });
 watch(theme, () => setTimeout(render, 0));

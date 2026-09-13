@@ -35,7 +35,9 @@ async function submit() {
 }
 
 async function copy() {
-  if (result.value && (await copyText(snippetFor(result.value.token.token)))) toast('已复制接入代码');
+  if (!result.value) return;
+  if (await copyText(snippetFor(result.value.token.token))) toast('已复制接入代码');
+  else toast('复制失败，请手动选择代码复制', 'error');
 }
 </script>
 

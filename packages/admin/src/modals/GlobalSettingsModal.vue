@@ -13,6 +13,7 @@ const tab = ref<'appearance' | 'account' | 'about'>('appearance');
 const { theme } = useTheme();
 const { setAuthed } = useAuth();
 const router = useRouter();
+const version = __APP_VERSION__;
 
 const themeOptions: Array<{ label: string; value: Theme }> = [
   { label: '跟随系统', value: 'system' },
@@ -51,7 +52,8 @@ async function logout() {
     <div v-else>
       <p><b>CatCounter</b></p>
       <p class="text-2">部署在 Cloudflare Workers 上的博客访问量统计，数据存于 D1。</p>
-      <p class="text-2">源码：<a href="https://github.com/finchxu/CatCounter" target="_blank" rel="noopener">github.com/finchxu/CatCounter</a></p>
+      <p class="text-2">源码：<a href="https://github.com/finch-xu/CatCounter" target="_blank" rel="noopener noreferrer">github.com/finch-xu/CatCounter</a></p>
+      <p class="text-2">版本：{{ version }}</p>
     </div>
   </Modal>
 </template>

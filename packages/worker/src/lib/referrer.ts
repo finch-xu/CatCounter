@@ -19,5 +19,6 @@ export function referrerOf(raw: string | undefined, origins: string[]): string {
     }
   }
   if (ownHosts.has(strippedHost)) return 'direct';
+  if (strippedHost.length > 255 || !/^[a-z0-9.-]+$/.test(strippedHost)) return 'direct';
   return strippedHost;
 }

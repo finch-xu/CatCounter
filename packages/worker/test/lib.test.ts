@@ -78,6 +78,9 @@ describe('referrer', () => {
   it('returns direct for invalid url', () => {
     expect(referrerOf('not a url', origins)).toBe('direct');
   });
+  it('returns direct for an oversized host', () => {
+    expect(referrerOf('https://' + 'a'.repeat(300) + '.com/', origins)).toBe('direct');
+  });
 });
 
 describe('origin', () => {
