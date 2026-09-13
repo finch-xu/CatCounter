@@ -151,3 +151,4 @@ dist/
 .wrangler/
 packages/worker/assets/*
 !packages/worker/assets/.gitkeep
+.dev.vars
