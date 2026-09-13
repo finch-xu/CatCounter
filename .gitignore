@@ -144,3 +144,4 @@ vite.config.ts.timestamp-*
 
 # 本地设计文档，不公开
 docs/
+.superpowers/
