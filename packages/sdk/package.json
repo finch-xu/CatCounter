@@ -1,0 +1,17 @@
+{
+  "name": "@catcounter/sdk",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --minify --format=iife --target=es2018 --outfile=../worker/assets/catcounter.js",
+    "test": "vitest run",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": { "@catcounter/shared": "workspace:*" },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "jsdom": "^30.0.1",
+    "typescript": "5.9.3",
+    "vitest": "^4.1.11"
+  }
+}
