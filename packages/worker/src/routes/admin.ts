@@ -200,6 +200,6 @@ adminRoutes.get('/sites/:id/stats', async (c) => {
   const from = c.req.query('from') ?? addDays(to, -29);
   if (!DAY_RE.test(from) || !DAY_RE.test(to)) return c.json({ error: '日期格式应为 YYYY-MM-DD' }, 400);
   if (from > to) return c.json({ error: '开始日期不能晚于结束日期' }, 400);
-  if (addDays(from, MAX_RANGE_DAYS) < to) return c.json({ error: '范围最多 366 天' }, 400);
+  if (addDays(from, MAX_RANGE_DAYS - 1) < to) return c.json({ error: '范围最多 366 天' }, 400);
   return c.json(await getSiteStats(c.env.DB, id, from, to));
 });

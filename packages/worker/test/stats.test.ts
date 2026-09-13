@@ -83,5 +83,7 @@ describe('stats routes', () => {
     expect((await adminApi(`/sites/${id}/stats?from=bad`, cookie)).status).toBe(400);
     expect((await adminApi(`/sites/${id}/stats?from=2026-09-10&to=2026-09-01`, cookie)).status).toBe(400);
     expect((await adminApi(`/sites/${id}/stats?from=2020-01-01&to=2026-09-01`, cookie)).status).toBe(400);
+    expect((await adminApi(`/sites/${id}/stats?from=2025-01-01&to=2026-01-01`, cookie)).status).toBe(200); // 恰好 366 天
+    expect((await adminApi(`/sites/${id}/stats?from=2025-01-01&to=2026-01-02`, cookie)).status).toBe(400); // 367 天
   });
 });
