@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SiteSummary } from '@catcounter/shared';
+import logo from '../assets/logo.png';
 defineProps<{ sites: SiteSummary[] }>();
 defineEmits<{ 'open-settings': [] }>();
 </script>
@@ -7,7 +8,7 @@ defineEmits<{ 'open-settings': [] }>();
 <template>
   <aside class="sidebar">
     <div class="brand">
-      <span class="dot" />
+      <img class="logo" :src="logo" alt="" />
       <span class="name">CatCounter</span>
     </div>
     <nav class="nav">
@@ -42,7 +43,7 @@ defineEmits<{ 'open-settings': [] }>();
   background: var(--panel); border-right: 1px solid var(--border);
 }
 .brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 12px; }
-.dot { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); }
+.logo { width: 30px; height: 30px; object-fit: contain; }
 .name { font-family: var(--font-serif); font-size: 20px; }
 .nav { flex: 1; padding: 8px 12px; overflow-y: auto; }
 .nav-group { font-size: 12px; color: var(--text-3); padding: 16px 8px 6px; }

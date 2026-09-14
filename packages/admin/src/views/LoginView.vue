@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api';
 import { useAuth } from '../composables/useAuth';
+import logo from '../assets/logo.png';
 
 const password = ref('');
 const error = ref('');
@@ -30,7 +31,7 @@ async function submit() {
 <template>
   <div class="login">
     <form class="card box" @submit.prevent="submit">
-      <div class="brand"><span class="dot" /><span class="name">CatCounter</span></div>
+      <div class="brand"><img class="logo" :src="logo" alt="" /><span class="name">CatCounter</span></div>
       <p class="text-2">输入管理员密码进入后台</p>
       <div class="field">
         <input v-model="password" class="input" type="password" placeholder="密码" autofocus />
@@ -45,7 +46,7 @@ async function submit() {
 .login { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
 .box { width: 360px; padding: 28px; }
 .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.dot { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); }
+.logo { width: 36px; height: 36px; object-fit: contain; }
 .name { font-family: var(--font-serif); font-size: 22px; }
 .full { width: 100%; justify-content: center; }
 </style>

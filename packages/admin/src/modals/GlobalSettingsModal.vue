@@ -6,6 +6,7 @@ import Modal from '../components/Modal.vue';
 import SegmentedControl from '../components/SegmentedControl.vue';
 import { useAuth } from '../composables/useAuth';
 import { useTheme, type Theme } from '../composables/useTheme';
+import logo from '../assets/logo.png';
 
 defineProps<{ open: boolean }>();
 const emit = defineEmits<{ close: [] }>();
@@ -30,7 +31,7 @@ async function logout() {
 </script>
 
 <template>
-  <Modal :open="open" title="设置" @close="emit('close')">
+  <Modal :open="open" title="设置" height="420px" @close="emit('close')">
     <template #nav>
       <button class="modal-nav" :class="{ active: tab === 'appearance' }" @click="tab = 'appearance'">外观</button>
       <button class="modal-nav" :class="{ active: tab === 'account' }" @click="tab = 'account'">账户</button>
@@ -49,7 +50,8 @@ async function logout() {
       <button class="btn" @click="logout">退出登录</button>
     </div>
 
-    <div v-else>
+    <div v-else class="about">
+      <img class="about-logo" :src="logo" alt="CatCounter logo" />
       <p><b>CatCounter</b></p>
       <p class="text-2">部署在 Cloudflare Workers 上的博客访问量统计，数据存于 D1。</p>
       <p class="text-2">源码：<a href="https://github.com/finch-xu/CatCounter" target="_blank" rel="noopener noreferrer">github.com/finch-xu/CatCounter</a></p>
@@ -57,3 +59,9 @@ async function logout() {
     </div>
   </Modal>
 </template>
+
+<style scoped>
+.about { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding-top: 8px; }
+.about-logo { width: 96px; height: 96px; object-fit: contain; margin-bottom: 4px; }
+.about p { margin: 0; }
+</style>

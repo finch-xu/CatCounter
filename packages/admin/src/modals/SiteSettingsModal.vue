@@ -129,7 +129,7 @@ async function remove() {
 </script>
 
 <template>
-  <Modal :open="open" :title="`站点设置 · ${site.name}`" wide @close="emit('close')">
+  <Modal :open="open" :title="`站点设置 · ${site.name}`" wide height="640px" @close="emit('close')">
     <template #nav>
       <button class="modal-nav" :class="{ active: tab === 'basic' }" @click="tab = 'basic'">基本信息</button>
       <button class="modal-nav" :class="{ active: tab === 'tokens' }" @click="tab = 'tokens'">Token</button>

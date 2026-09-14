@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted } from 'vue';
-const props = defineProps<{ open: boolean; title: string; wide?: boolean }>();
+// height：固定弹窗高度（CSS 长度），避免切换分页时高度跳动；超出部分在内容区滚动
+const props = defineProps<{ open: boolean; title: string; wide?: boolean; height?: string }>();
 const emit = defineEmits<{ close: [] }>();
 function onKey(e: KeyboardEvent) {
   if (!props.open || e.key !== 'Escape') return;
@@ -13,7 +14,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
 <template>
   <Teleport to="body">
     <div v-if="open" class="overlay" @click.self="emit('close')">
-      <div class="dialog card" :class="{ wide }">
+      <div class="dialog card" :class="{ wide }" :style="height ? { height: `min(${height}, 85vh)` } : undefined">
         <aside v-if="$slots.nav" class="nav"><slot name="nav" /></aside>
         <section class="body">
           <header class="head">
@@ -35,5 +36,5 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
 .body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
 .title { font-size: 16px; }
-.content { padding: 20px; overflow-y: auto; }
+.content { flex: 1; min-height: 0; padding: 20px; overflow-y: auto; }
 </style>
