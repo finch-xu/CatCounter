@@ -17,6 +17,9 @@ const { t } = useI18n();
       <router-link :to="{ name: 'overview' }" class="nav-item" exact-active-class="active">
         <span>{{ t('sidebar.overview') }}</span>
       </router-link>
+      <router-link :to="{ name: 'details' }" class="nav-item" active-class="active">
+        <span>{{ t('sidebar.details') }}</span>
+      </router-link>
       <div class="nav-group">{{ t('sidebar.sites') }}</div>
       <router-link
         v-for="s in sites" :key="s.id"
@@ -46,7 +49,7 @@ const { t } = useI18n();
 }
 .brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 12px; }
 .logo { width: 30px; height: 30px; object-fit: contain; }
-.name { font-family: var(--font-serif); font-size: 20px; }
+.name { font-size: 20px; }
 .nav { flex: 1; padding: 8px 12px; overflow-y: auto; }
 .nav-group { font-size: 12px; color: var(--text-3); padding: 16px 8px 6px; }
 .nav-item {

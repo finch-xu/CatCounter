@@ -12,8 +12,8 @@
   --radius: 10px;
   --sidebar-w: 240px;
   --header-h: 56px;
-  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Segoe UI", "Microsoft YaHei", sans-serif;
-  --font-serif: Georgia, "Songti SC", "Noto Serif SC", serif;
+  /* 系统界面字体：由操作系统按 <html lang> 选择中日英字形 */
+  --font: system-ui, sans-serif;
   --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.18);
   color-scheme: light;
 }

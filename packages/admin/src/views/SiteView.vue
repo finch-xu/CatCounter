@@ -10,6 +10,7 @@ import StatTile from '../components/StatTile.vue';
 import TrendChart from '../components/TrendChart.vue';
 import SiteSettingsModal from '../modals/SiteSettingsModal.vue';
 import { api } from '../api';
+import { presetDates, useRangeOptions, type Range } from '../composables/useDateRange';
 import { useSites } from '../composables/useSites';
 import { useToast } from '../composables/useToast';
 
@@ -18,8 +19,8 @@ const router = useRouter();
 const { reload } = useSites();
 const { toast } = useToast();
 const { t, n } = useI18n();
+const rangeOptions = useRangeOptions();
 
-type Range = '7' | '30' | '90' | 'custom';
 const range = ref<Range>('30');
 const from = ref('');
 const to = ref('');
@@ -31,23 +32,12 @@ const deviceLabels = computed<Record<string, string>>(() => ({
   desktop: t('site.deviceDesktop'), mobile: t('site.deviceMobile'), tablet: t('site.deviceTablet'),
 }));
 const referrerLabels = computed<Record<string, string>>(() => ({ direct: t('site.referrerDirect') }));
-const rangeOptions = computed(() => [
-  { label: t('site.days', { n: 7 }), value: '7' as const },
-  { label: t('site.days', { n: 30 }), value: '30' as const },
-  { label: t('site.days', { n: 90 }), value: '90' as const },
-  { label: t('site.custom'), value: 'custom' as const },
-]);
 
-function dayStr(d: Date): string {
-  return d.toISOString().slice(0, 10);
-}
 function applyRange() {
   if (range.value === 'custom') return;
-  const today = new Date();
-  const start = new Date(today);
-  start.setUTCDate(start.getUTCDate() - (Number(range.value) - 1));
-  from.value = dayStr(start);
-  to.value = dayStr(today);
+  const d = presetDates(range.value);
+  from.value = d.from;
+  to.value = d.to;
 }
 
 const rangeTotals = computed(() => {

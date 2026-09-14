@@ -1,4 +1,6 @@
-import type { ApiErrorBody, ApiErrorCode, Counts, Overview, PageRow, Site, SiteStats, Token } from '@catcounter/shared';
+import type {
+  ApiErrorBody, ApiErrorCode, Counts, Overview, PageRow, PageStatsList, PageStatsSort, Site, SiteStats, Token,
+} from '@catcounter/shared';
 import { i18n } from './i18n';
 
 export class ApiError extends Error {
@@ -53,6 +55,14 @@ export const api = {
   deleteSite: (id: string) => req<{ ok: true }>(`/sites/${id}`, { method: 'DELETE' }),
   stats: (id: string, from: string, to: string) => req<SiteStats>(`/sites/${id}/stats?from=${from}&to=${to}`),
   pages: (id: string, q: string) => req<PageRow[]>(`/sites/${id}/pages?q=${encodeURIComponent(q)}&limit=20`),
+  /** 详细数据表格；site 为空字符串表示全部站点 */
+  pageStats: (p: {
+    site: string; from: string; to: string; q: string; group: string;
+    sort: PageStatsSort; dir: 'asc' | 'desc'; limit: number; offset: number;
+  }) => {
+    const qs = new URLSearchParams({ ...p, limit: String(p.limit), offset: String(p.offset) });
+    return req<PageStatsList>(`/page-stats?${qs}`);
+  },
   setSiteCounters: (id: string, c: Partial<Counts>) => req<Site>(`/sites/${id}/counters`, { method: 'PUT', body: json(c) }),
   setPageCounters: (id: string, path: string, c: Partial<Counts>) =>
     req<{ ok: true }>(`/sites/${id}/pages/counters`, { method: 'PUT', body: json({ path, ...c }) }),

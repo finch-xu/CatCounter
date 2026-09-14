@@ -31,6 +31,7 @@ function load(): Locale {
 
 const dateTimeFormat = {
   long: { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' },
+  date: { year: 'numeric', month: '2-digit', day: '2-digit' },
 } as const;
 
 export const i18n = createI18n<[MessageSchema], Locale, false>({

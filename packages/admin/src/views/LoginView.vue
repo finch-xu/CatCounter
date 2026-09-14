@@ -54,6 +54,6 @@ async function submit() {
 .box { width: 360px; padding: 28px; }
 .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .logo { width: 36px; height: 36px; object-fit: contain; }
-.name { font-family: var(--font-serif); font-size: 22px; }
+.name { font-size: 22px; }
 .full { width: 100%; justify-content: center; }
 </style>

@@ -6,6 +6,7 @@ export const router = createRouter({
   routes: [
     { path: '/login', name: 'login', component: () => import('./views/LoginView.vue'), meta: { public: true } },
     { path: '/', name: 'overview', component: () => import('./views/OverviewView.vue') },
+    { path: '/details', name: 'details', component: () => import('./views/DetailsView.vue') },
     { path: '/sites/:id', name: 'site', component: () => import('./views/SiteView.vue'), props: true },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],

@@ -52,6 +52,30 @@ export interface Overview {
 
 export interface PageRow { path: string; title: string | null; pv: number; uv: number; last_seen: number }
 
+/** 详细数据表格（跨站点）：range_* 是所选日期范围内的数据，pv/uv 是累计数据 */
+export type PageStatsSort = 'range_pv' | 'range_uv' | 'pv' | 'uv' | 'first_seen' | 'last_seen' | 'path' | 'site';
+export interface PageStatsRow {
+  site_id: string;
+  site_name: string;
+  path: string;
+  title: string | null;
+  range_pv: number;
+  range_uv: number;
+  pv: number;
+  uv: number;
+  first_seen: number;
+  last_seen: number;
+}
+/** 按路径第一段分组，例如 /posts/；prefix 也是筛选时回传的值 */
+export interface PageGroup { prefix: string; count: number }
+export interface PageStatsList {
+  from: string;
+  to: string;
+  total: number;
+  groups: PageGroup[];
+  rows: PageStatsRow[];
+}
+
 export type ApiErrorCode =
   | 'unauthorized'
   | 'bad_json'

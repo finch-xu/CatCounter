@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
-import { normalizePath } from '@catcounter/shared';
+import { normalizePath, type ApiErrorBody, type PageStatsSort } from '@catcounter/shared';
 import type { Env } from '../env';
 import { timingSafeEqualStr } from '../lib/crypto';
 import { apiError } from '../lib/errors';
@@ -10,7 +10,7 @@ import { createSession, verifySession } from '../lib/session';
 import {
   createSite, deleteSite, getSite, listPages, listSites, setPageCounters, setSiteCounters, updateSite,
 } from '../repo/sites';
-import { addDays, getOverview, getSiteStats } from '../repo/stats';
+import { addDays, getOverview, getSiteStats, listPageStats, PAGE_STATS_SORTS } from '../repo/stats';
 import { createToken, listTokens, revokeToken } from '../repo/tokens';
 
 export const adminRoutes = new Hono<{ Bindings: Env }>();
@@ -194,6 +194,16 @@ function isDay(s: string): boolean {
 }
 const MAX_RANGE_DAYS = 366;
 
+/** 读取 from/to 查询参数，默认最近 30 天；不合法时返回错误体 */
+function parseRange(query: (key: string) => string | undefined): { from: string; to: string } | { error: ApiErrorBody } {
+  const to = query('to') ?? dayOf(now());
+  const from = query('from') ?? addDays(to, -29);
+  if (!isDay(from) || !isDay(to)) return { error: apiError('invalid_date') };
+  if (from > to) return { error: apiError('date_range_inverted') };
+  if (addDays(from, MAX_RANGE_DAYS - 1) < to) return { error: apiError('date_range_too_long', { max: MAX_RANGE_DAYS }) };
+  return { from, to };
+}
+
 adminRoutes.get('/overview', async (c) => {
   const today = dayOf(now());
   return c.json(await getOverview(c.env.DB, today, addDays(today, -29)));
@@ -202,13 +212,30 @@ adminRoutes.get('/overview', async (c) => {
 adminRoutes.get('/sites/:id/stats', async (c) => {
   const id = c.req.param('id');
   if (!(await getSite(c.env.DB, id))) return c.json(apiError('not_found'), 404);
-  const today = dayOf(now());
-  const to = c.req.query('to') ?? today;
-  const from = c.req.query('from') ?? addDays(to, -29);
-  if (!isDay(from) || !isDay(to)) return c.json(apiError('invalid_date'), 400);
-  if (from > to) return c.json(apiError('date_range_inverted'), 400);
-  if (addDays(from, MAX_RANGE_DAYS - 1) < to) return c.json(apiError('date_range_too_long', { max: MAX_RANGE_DAYS }), 400);
-  return c.json(await getSiteStats(c.env.DB, id, from, to));
+  const range = parseRange((k) => c.req.query(k));
+  if ('error' in range) return c.json(range.error, 400);
+  return c.json(await getSiteStats(c.env.DB, id, range.from, range.to));
+});
+
+/** 详细数据：跨站点的页面表格，site 为空表示全部站点 */
+adminRoutes.get('/page-stats', async (c) => {
+  const site = c.req.query('site') ?? '';
+  if (site && !(await getSite(c.env.DB, site))) return c.json(apiError('not_found'), 404);
+  const range = parseRange((k) => c.req.query(k));
+  if ('error' in range) return c.json(range.error, 400);
+  const sort = c.req.query('sort') as PageStatsSort | undefined;
+  return c.json(
+    await listPageStats(c.env.DB, {
+      ...range,
+      site,
+      q: (c.req.query('q') ?? '').trim(),
+      group: c.req.query('group') ?? '',
+      sort: sort && PAGE_STATS_SORTS.includes(sort) ? sort : 'range_pv',
+      dir: c.req.query('dir') === 'asc' ? 'asc' : 'desc',
+      limit: Math.min(Math.max(Number(c.req.query('limit') ?? 50) || 50, 1), 200),
+      offset: Math.max(Number(c.req.query('offset') ?? 0) || 0, 0),
+    }),
+  );
 });
 
 adminRoutes.all('*', (c) => c.json(apiError('not_found'), 404));
