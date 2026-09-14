@@ -57,6 +57,40 @@
 
 ## 接入 Hexo 主题
 
+### hexo-theme-warmpaper（内置支持）
+
+[hexo-theme-warmpaper](https://github.com/finch-xu/hexo-theme-warmpaper) 已内置 CatCounter，不用改模板，填好配置即可：
+
+1. 在后台新建站点，Origin 白名单填博客域名（本地 `hexo server` 预览时再加上 `http://localhost:4000`），复制 token。
+2. 在博客的主题配置文件里修改 `_config.yml`：
+
+   ```yaml
+    catcounter:
+      enable: true
+      endpoint: 'https://counter.example.com'   # Worker 域名，不带路径
+      token: ''                                  # 后台新建站点得到的 cc_xxx
+      show_site: true    # 页脚显示「总访问 / 访客」
+      show_post: true    # 文章页 meta 行显示「阅读 N」
+      show_list: true    # 首页列表每张卡片显示「阅读 N」（每页多一次只读请求，不计数）
+      label_site_pv: '总访问'
+      label_site_uv: '访客'
+      label_page_pv: '阅读'
+   ```
+
+   这是 Hexo 5+ 的独立主题配置文件，会与主题自带的 `_config.yml` 深度合并，之后 `git pull` 升级主题不会产生冲突。也可以直接修改 `themes/warmpaper/_config.yml` 里的同名配置块。
+3. 重启 `hexo server` 查看效果。
+
+开启后页脚显示站点总访问 / 访客，文章页 meta 行和首页文章卡片显示阅读量。以下可选项写在同一个 `catcounter` 块里：
+
+| 选项 | 默认值 | 说明 |
+|---|---|---|
+| `show_site` | `true` | 页脚显示站点总访问 / 访客 |
+| `show_post` | `true` | 文章页 meta 行显示阅读量 |
+| `show_list` | `true` | 首页每张文章卡片显示阅读量，每页多一次只读请求，不计数 |
+| `label_site_pv` / `label_site_uv` / `label_page_pv` | `总访问` / `访客` / `阅读` | 显示文案 |
+
+### 其他主题
+
 在主题的 `_config.yml` 增加：
 
 ```yaml

@@ -57,6 +57,40 @@
 
 ## Hexo テーマへの導入
 
+### hexo-theme-warmpaper（組み込みサポート）
+
+[hexo-theme-warmpaper](https://github.com/finch-xu/hexo-theme-warmpaper) は CatCounter に標準対応しているため、テンプレートを編集する必要はありません。設定を記入するだけです：
+
+1. 管理画面でサイトを作成し、Origin 許可リストにブログのオリジンを追加して（ローカルで `hexo server` を使う場合は `http://localhost:4000` も追加）、token をコピーします。
+2. ブログのテーマ設定ファイル `_config.yml` を編集します：
+
+   ```yaml
+    catcounter:
+      enable: true
+      endpoint: 'https://counter.example.com'   # Worker のオリジン（パスなし）
+      token: ''                                  # 管理画面でサイトを作成して発行した cc_xxx
+      show_site: true    # フッターに「総アクセス / 訪問者」を表示
+      show_post: true    # 記事ページのメタ行に「閲覧 N」を表示
+      show_list: true    # トップページ一覧の各カードに「閲覧 N」を表示（ページごとに読み取り専用リクエストが 1 回増える。カウントはしない）
+      label_site_pv: '総アクセス'
+      label_site_uv: '訪問者'
+      label_page_pv: '閲覧'
+   ```
+
+   これは Hexo 5 以降の独立したテーマ設定ファイルで、テーマ本体の `_config.yml` とディープマージされます。そのため `git pull` でテーマを更新してもコンフリクトしません。`themes/warmpaper/_config.yml` の同名ブロックを直接編集しても構いません。
+3. `hexo server` を再起動して確認します。
+
+有効にすると、フッターにサイト全体の総閲覧数 / 訪問者数、記事ページのメタ行とトップページの各記事カードに閲覧数が表示されます。以下の任意項目も同じ `catcounter` ブロックに記述します：
+
+| 項目 | デフォルト | 説明 |
+|---|---|---|
+| `show_site` | `true` | フッターにサイト全体の総閲覧数 / 訪問者数を表示 |
+| `show_post` | `true` | 記事ページのメタ行に閲覧数を表示 |
+| `show_list` | `true` | トップページの各記事カードに閲覧数を表示。ページごとに読み取り専用リクエストが 1 回増える（カウントはしない） |
+| `label_site_pv` / `label_site_uv` / `label_page_pv` | `总访问` / `访客` / `阅读` | 表示テキスト。デフォルトは中国語なので、例えば `label_page_pv: 閲覧` のように変更 |
+
+### その他のテーマ
+
 テーマの `_config.yml` に以下を追加します：
 
 ```yaml

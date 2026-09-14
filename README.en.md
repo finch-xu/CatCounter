@@ -57,6 +57,40 @@ This post has <span data-cc="page_pv">-</span> views from <span data-cc="page_uv
 
 ## Hexo theme integration
 
+### hexo-theme-warmpaper (built-in support)
+
+[hexo-theme-warmpaper](https://github.com/finch-xu/hexo-theme-warmpaper) ships with CatCounter support, so no template changes are needed. Just fill in the config:
+
+1. Create a site in the admin panel, add your blog origin to its origin allowlist (plus `http://localhost:4000` for local `hexo server` previews), and copy the token.
+2. Edit `_config.yml` in the blog's theme config:
+
+   ```yaml
+    catcounter:
+      enable: true
+      endpoint: 'https://counter.example.com'   # Worker origin, no path
+      token: ''                                  # cc_xxx from the admin panel
+      show_site: true    # site-wide "Views / Visitors" in the footer
+      show_post: true    # "Views N" in the post meta line
+      show_list: true    # "Views N" on each card of the home page list (one extra read-only request per page, no counting)
+      label_site_pv: 'Views'
+      label_site_uv: 'Visitors'
+      label_page_pv: 'Views'
+   ```
+
+   This is Hexo 5+'s alternate theme config file. It is deep-merged with the theme's own `_config.yml`, so updating the theme with `git pull` won't cause conflicts. You can also edit the same block in `themes/warmpaper/_config.yml` directly.
+3. Restart `hexo server` to see the result.
+
+Once enabled, the footer shows site-wide views / visitors, and the post meta line and each card on the home page show view counts. The following optional keys go in the same `catcounter` block:
+
+| Key | Default | Description |
+|---|---|---|
+| `show_site` | `true` | Site-wide views / visitors in the footer |
+| `show_post` | `true` | View count in the post meta line |
+| `show_list` | `true` | View count on each card of the home page list; one extra read-only request per page, no counting |
+| `label_site_pv` / `label_site_uv` / `label_page_pv` | `总访问` / `访客` / `阅读` | Display text; the defaults are Chinese, e.g. set `label_page_pv: Views` |
+
+### Other themes
+
 Add the following to the theme's `_config.yml`:
 
 ```yaml
