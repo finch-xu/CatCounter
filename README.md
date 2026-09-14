@@ -1,6 +1,10 @@
-# CatCounter
+<p align="center">
+  <img src="assets/logo.png" alt="CatCounter logo" width="200">
+</p>
 
-部署在 Cloudflare Workers 上的博客访问量统计服务。免费套餐即可运行，只依赖 D1 数据库。
+<h1 align="center">CatCounter</h1>
+
+<p align="center">部署在 Cloudflare Workers 上的博客访问量统计服务。免费套餐即可运行，只依赖 D1 数据库。</p>
 
 - 站点总 PV/UV、每篇文章 PV/UV，按日趋势，来源 / 地区 / 设备分布
 - 一个部署可以接入多个博客，各自独立 token
