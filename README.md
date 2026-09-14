@@ -11,18 +11,17 @@
 ## 部署（全程在 Cloudflare 控制台操作）
 
 1. **Fork 本仓库**到你的 GitHub 账号。
-2. **创建 D1 数据库**：Cloudflare 控制台 → Storage & Databases → D1 SQL Database → Create → 名称填 `catcounter`。创建后在数据库页面复制 **Database ID**。
-3. **填写数据库 ID**：在你的 fork 里编辑根目录 `wrangler.toml`，把 `database_id` 的值换成上一步的 ID，提交。
-4. **连接 Git 部署**：控制台 → Workers & Pages → Create → Workers → Import a repository → 选择你的 fork。
+2. **连接 Git 部署**：控制台 → Workers & Pages → Create → Workers → Import a repository → 选择你的 fork。
    - Build command：`pnpm install && pnpm build`
    - Deploy command：保持默认 `npx wrangler deploy`
    - 其余保持默认，点击 Create and deploy。
-5. **设置密码**：部署完成后进入该 Worker → Settings → Variables and Secrets → Add：
+   首次部署时 Wrangler 会自动创建名为 `catcounter` 的 D1 数据库并绑定到 Worker，不需要手动建库。如果账号里已有同名数据库会直接复用。
+3. **设置密码**：部署完成后进入该 Worker → Settings → Variables and Secrets → Add：
    - `ADMIN_PASSWORD`：后台登录密码（类型选 Secret）
    - `SESSION_SECRET`：任意长随机串，用于签名会话和访客哈希（类型选 Secret）
    然后回到 Deployments 页面点击最新一次部署的 Retry deployment，让 secret 生效。
-6. **登录后台**：打开 `https://<你的worker>.workers.dev/admin/`，输入密码，新建第一个站点。数据库表会在第一次请求时自动创建。
-7. 可选：Settings → Domains & Routes 绑定自定义域名，例如 `counter.example.com`。
+4. **登录后台**：打开 `https://<你的worker>.workers.dev/admin/`，输入密码，新建第一个站点。数据库表会在第一次请求时自动创建。
+5. 可选：Settings → Domains & Routes 绑定自定义域名，例如 `counter.example.com`。
 
 之后每次向 fork 的 main 分支推送，Cloudflare 会自动重新构建部署。
 

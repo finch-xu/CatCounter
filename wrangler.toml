@@ -5,8 +5,7 @@ compatibility_date = "2026-09-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "catcounter"
-# 部署前把下面的值换成你在 Cloudflare 控制台创建的 D1 数据库 ID
-database_id = "00000000-0000-0000-0000-000000000000"
+# 故意不写 database_id：Wrangler 会在首次部署时自动创建并绑定同名 D1 数据库。
 
 [assets]
 directory = "packages/worker/assets"
