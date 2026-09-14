@@ -14,7 +14,7 @@ describe('admin sites', () => {
     expect(res.status).toBe(201);
     expect(data!.site.origins).toEqual(['https://blog.example.com']);
     expect(data!.token.token).toMatch(/^cc_/);
-    expect(data!.token.name).toBe('默认');
+    expect(data!.token.name).toBe('default');
 
     const list = await (await adminApi('/sites', cookie)).json() as Site[];
     expect(list.some((s) => s.id === data!.site.id)).toBe(true);
@@ -26,9 +26,13 @@ describe('admin sites', () => {
 
   it('validates input', async () => {
     const cookie = await login();
-    expect((await createSite(cookie, { name: '', origins: ['https://a.com'] })).res.status).toBe(400);
+    const noName = (await createSite(cookie, { name: '', origins: ['https://a.com'] })).res;
+    expect(noName.status).toBe(400);
+    expect(await noName.json()).toMatchObject({ code: 'site_name_required', error: expect.any(String) });
     expect((await createSite(cookie, { name: 'x', origins: [] })).res.status).toBe(400);
-    expect((await createSite(cookie, { name: 'x', origins: ['not-an-origin'] })).res.status).toBe(400);
+    const badOrigin = (await createSite(cookie, { name: 'x', origins: ['not-an-origin'] })).res;
+    expect(badOrigin.status).toBe(400);
+    expect(await badOrigin.json()).toMatchObject({ code: 'invalid_origins' });
   });
 
   it('updates and deletes', async () => {

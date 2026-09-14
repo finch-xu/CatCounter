@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import type { Overview } from '@catcounter/shared';
 import PageHeader from '../components/PageHeader.vue';
@@ -12,6 +13,7 @@ import { useToast } from '../composables/useToast';
 const router = useRouter();
 const { reload } = useSites();
 const { toast } = useToast();
+const { t, n } = useI18n();
 const data = ref<Overview | null>(null);
 const showNew = ref(false);
 
@@ -19,46 +21,52 @@ async function load() {
   try {
     data.value = await reload();
   } catch (e) {
-    toast(e instanceof Error ? e.message : '加载失败', 'error');
+    toast(e instanceof Error ? e.message : t('common.loadFailed'), 'error');
   }
 }
 onMounted(load);
 </script>
 
 <template>
-  <PageHeader title="总览">
+  <PageHeader :title="t('overview.title')">
     <template #actions>
-      <button class="btn btn-primary" @click="showNew = true">+ 新建站点</button>
+      <button class="btn btn-primary" @click="showNew = true">{{ t('overview.newSite') }}</button>
     </template>
   </PageHeader>
 
   <div v-if="data" class="content">
     <div class="grid-stats">
-      <StatTile label="站点" :value="data.totals.sites" />
-      <StatTile label="今日 PV" :value="data.totals.today.pv" />
-      <StatTile label="今日 UV" :value="data.totals.today.uv" />
-      <StatTile label="累计 PV" :value="data.totals.all.pv" />
-      <StatTile label="累计 UV" :value="data.totals.all.uv" />
+      <StatTile :label="t('stats.sites')" :value="data.totals.sites" />
+      <StatTile :label="t('stats.todayPv')" :value="data.totals.today.pv" />
+      <StatTile :label="t('stats.todayUv')" :value="data.totals.today.uv" />
+      <StatTile :label="t('stats.totalPv')" :value="data.totals.all.pv" />
+      <StatTile :label="t('stats.totalUv')" :value="data.totals.all.uv" />
     </div>
 
-    <div class="section-title">近 30 天（全部站点）</div>
+    <div class="section-title">{{ t('overview.last30Days') }}</div>
     <div class="card card-pad"><TrendChart :series="data.series" /></div>
 
-    <div class="section-title">站点</div>
+    <div class="section-title">{{ t('overview.sites') }}</div>
     <div class="card">
       <table class="tbl">
         <thead>
-          <tr><th>名称</th><th class="num">今日 PV</th><th class="num">今日 UV</th><th class="num">累计 PV</th><th class="num">累计 UV</th></tr>
+          <tr>
+            <th>{{ t('common.name') }}</th>
+            <th class="num">{{ t('stats.todayPv') }}</th>
+            <th class="num">{{ t('stats.todayUv') }}</th>
+            <th class="num">{{ t('stats.totalPv') }}</th>
+            <th class="num">{{ t('stats.totalUv') }}</th>
+          </tr>
         </thead>
         <tbody>
           <tr v-for="s in data.sites" :key="s.id" class="clickable" @click="router.push({ name: 'site', params: { id: s.id } })">
-            <td>{{ s.name }}<div class="muted small">{{ s.origins.join('、') }}</div></td>
-            <td class="num">{{ s.today.pv }}</td>
-            <td class="num">{{ s.today.uv }}</td>
-            <td class="num">{{ s.pv.toLocaleString('zh-CN') }}</td>
-            <td class="num">{{ s.uv.toLocaleString('zh-CN') }}</td>
+            <td>{{ s.name }}<div class="muted small">{{ s.origins.join(t('common.listSeparator')) }}</div></td>
+            <td class="num">{{ n(s.today.pv) }}</td>
+            <td class="num">{{ n(s.today.uv) }}</td>
+            <td class="num">{{ n(s.pv) }}</td>
+            <td class="num">{{ n(s.uv) }}</td>
           </tr>
-          <tr v-if="data.sites.length === 0"><td colspan="5" class="muted">还没有站点，点击右上角新建。</td></tr>
+          <tr v-if="data.sites.length === 0"><td colspan="5" class="muted">{{ t('overview.empty') }}</td></tr>
         </tbody>
       </table>
     </div>

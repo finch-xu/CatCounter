@@ -1,7 +1,8 @@
-import type { Counts, Overview, PageRow, Site, SiteStats, Token } from '@catcounter/shared';
+import type { ApiErrorBody, ApiErrorCode, Counts, Overview, PageRow, Site, SiteStats, Token } from '@catcounter/shared';
+import { i18n } from './i18n';
 
 export class ApiError extends Error {
-  constructor(message: string, public status: number) {
+  constructor(message: string, public status: number, public code?: ApiErrorCode) {
     super(message);
   }
 }
@@ -11,14 +12,27 @@ export function setUnauthorizedHandler(fn: () => void): void {
   onUnauthorized = fn;
 }
 
+/**
+ * 把错误响应转成当前界面语言的提示文字。优先级：
+ * 1. 已翻译的 code → 当前语言文案
+ * 2. 未翻译的 code 或旧格式响应 → 后端的英文 error（比通用提示更具体）
+ * 3. 非 JSON 响应（比如网关返回的 HTML 错误页）→ 带状态码的通用提示
+ */
+function errorMessage(body: Partial<ApiErrorBody>, status: number): string {
+  const { t, te } = i18n.global;
+  const key = `errors.${body.code}`;
+  if (body.code && te(key)) return t(key, body.params ?? {});
+  return body.error || t('errors.requestFailed', { status });
+}
+
 async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   if (init.body) headers.set('content-type', 'application/json');
   const res = await fetch('/admin/api' + path, { ...init, headers, credentials: 'same-origin' });
   if (res.status === 401 && path !== '/login' && path !== '/me') onUnauthorized?.();
   if (!res.ok) {
-    const body = (await res.json().catch(() => ({}))) as { error?: string };
-    throw new ApiError(body.error || `请求失败（${res.status}）`, res.status);
+    const body = (await res.json().catch(() => ({}))) as Partial<ApiErrorBody>;
+    throw new ApiError(errorMessage(body, res.status), res.status, body.code);
   }
   return (await res.json()) as T;
 }

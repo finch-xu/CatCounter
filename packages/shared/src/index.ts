@@ -51,3 +51,26 @@ export interface Overview {
 }
 
 export interface PageRow { path: string; title: string | null; pv: number; uv: number; last_seen: number }
+
+export type ApiErrorCode =
+  | 'unauthorized'
+  | 'bad_json'
+  | 'wrong_password'
+  | 'site_name_required'
+  | 'invalid_origins'
+  | 'invalid_retention'
+  | 'invalid_counter'
+  | 'path_required'
+  | 'not_found'
+  | 'invalid_date'
+  | 'date_range_inverted'
+  | 'date_range_too_long'
+  | 'not_configured'
+  | 'internal_error';
+
+/** 后台接口的错误响应：error 是英文说明，code 供后台按界面语言翻译，params 是翻译用的插值 */
+export interface ApiErrorBody {
+  error: string;
+  code: ApiErrorCode;
+  params?: Record<string, string | number>;
+}

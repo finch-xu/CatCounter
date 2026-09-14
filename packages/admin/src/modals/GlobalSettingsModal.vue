@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { api } from '../api';
 import Modal from '../components/Modal.vue';
 import SegmentedControl from '../components/SegmentedControl.vue';
 import { useAuth } from '../composables/useAuth';
 import { useTheme, type Theme } from '../composables/useTheme';
+import { LOCALES, type Locale } from '../i18n';
 import logo from '../assets/logo.png';
 
 defineProps<{ open: boolean }>();
@@ -13,14 +15,20 @@ const emit = defineEmits<{ close: [] }>();
 const tab = ref<'appearance' | 'account' | 'about'>('appearance');
 const { theme } = useTheme();
 const { setAuthed } = useAuth();
+const { t, locale } = useI18n();
 const router = useRouter();
 const version = __APP_VERSION__;
 
-const themeOptions: Array<{ label: string; value: Theme }> = [
-  { label: '跟随系统', value: 'system' },
-  { label: '浅色', value: 'light' },
-  { label: '深色', value: 'dark' },
-];
+const themeOptions = computed<Array<{ label: string; value: Theme }>>(() => [
+  { label: t('settings.themeSystem'), value: 'system' },
+  { label: t('settings.themeLight'), value: 'light' },
+  { label: t('settings.themeDark'), value: 'dark' },
+]);
+const localeOptions = LOCALES.map((l) => ({ label: l.label, value: l.value }));
+const currentLocale = computed<Locale>({
+  get: () => locale.value as Locale,
+  set: (v) => { locale.value = v; },
+});
 
 async function logout() {
   try { await api.logout(); } catch { /* 即使失败也清理本地状态 */ }
@@ -31,31 +39,41 @@ async function logout() {
 </script>
 
 <template>
-  <Modal :open="open" title="设置" height="420px" @close="emit('close')">
+  <Modal :open="open" :title="t('settings.title')" height="420px" @close="emit('close')">
     <template #nav>
-      <button class="modal-nav" :class="{ active: tab === 'appearance' }" @click="tab = 'appearance'">外观</button>
-      <button class="modal-nav" :class="{ active: tab === 'account' }" @click="tab = 'account'">账户</button>
-      <button class="modal-nav" :class="{ active: tab === 'about' }" @click="tab = 'about'">关于</button>
+      <button class="modal-nav" :class="{ active: tab === 'appearance' }" @click="tab = 'appearance'">{{ t('settings.tabAppearance') }}</button>
+      <button class="modal-nav" :class="{ active: tab === 'account' }" @click="tab = 'account'">{{ t('settings.tabAccount') }}</button>
+      <button class="modal-nav" :class="{ active: tab === 'about' }" @click="tab = 'about'">{{ t('settings.tabAbout') }}</button>
     </template>
 
     <div v-if="tab === 'appearance'">
       <div class="field">
-        <label>主题</label>
+        <label>{{ t('settings.theme') }}</label>
         <SegmentedControl v-model="theme" :options="themeOptions" />
+      </div>
+      <div class="field">
+        <label>{{ t('settings.language') }}</label>
+        <SegmentedControl v-model="currentLocale" :options="localeOptions" />
       </div>
     </div>
 
     <div v-else-if="tab === 'account'">
-      <p class="text-2">当前以管理员身份登录。修改密码请在 Cloudflare 控制台更新 <code>ADMIN_PASSWORD</code> 后重新部署。</p>
-      <button class="btn" @click="logout">退出登录</button>
+      <i18n-t keypath="settings.accountHint" tag="p" class="text-2">
+        <template #secret><code>ADMIN_PASSWORD</code></template>
+      </i18n-t>
+      <button class="btn" @click="logout">{{ t('settings.logout') }}</button>
     </div>
 
     <div v-else class="about">
       <img class="about-logo" :src="logo" alt="CatCounter logo" />
       <p><b>CatCounter</b></p>
-      <p class="text-2">部署在 Cloudflare Workers 上的博客访问量统计，数据存于 D1。</p>
-      <p class="text-2">源码：<a href="https://github.com/finch-xu/CatCounter" target="_blank" rel="noopener noreferrer">github.com/finch-xu/CatCounter</a></p>
-      <p class="text-2">版本：{{ version }}</p>
+      <p class="text-2">{{ t('settings.aboutDescription') }}</p>
+      <i18n-t keypath="settings.source" tag="p" class="text-2">
+        <template #link>
+          <a href="https://github.com/finch-xu/CatCounter" target="_blank" rel="noopener noreferrer">github.com/finch-xu/CatCounter</a>
+        </template>
+      </i18n-t>
+      <p class="text-2">{{ t('settings.version', { version }) }}</p>
     </div>
   </Modal>
 </template>

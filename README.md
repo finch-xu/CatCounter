@@ -1,3 +1,7 @@
+<p align="right">
+  <b>简体中文</b> | <a href="README.en.md">English</a> | <a href="README.ja.md">日本語</a>
+</p>
+
 <p align="center">
   <img src="assets/logo.png" alt="CatCounter logo" width="200">
 </p>
@@ -8,7 +12,7 @@
 
 - 站点总 PV/UV、每篇文章 PV/UV，按日趋势，来源 / 地区 / 设备分布
 - 一个部署可以接入多个博客，各自独立 token
-- 自带管理后台：查看数据、管理站点和 token、手动修正计数
+- 自带管理后台：查看数据、管理站点和 token、手动修正计数；界面支持 English / 日本語 / 简体中文
 - 一行 script 标签接入，兼容不蒜子的元素 id
 - 不记录原始 IP，访客去重使用每日轮换的盐做哈希
 
@@ -138,6 +142,8 @@ pnpm build                        # 构建 SDK 和后台到 packages/worker/asse
 用 curl 模拟访问时必须带浏览器 User-Agent，例如 `-A 'Mozilla/5.0 (Macintosh) Chrome/120'`，因为 curl 默认的 UA 会被识别为爬虫而不计数。
 
 本地开发请使用 Chrome，它允许 `localhost` 上的 Secure cookie。
+
+后台的翻译文件在 `packages/admin/src/i18n/locales/`。`en.ts` 是基准，其他语言文件缺少或多出 key 都会在 typecheck 时报错。
 
 ## 结构
 

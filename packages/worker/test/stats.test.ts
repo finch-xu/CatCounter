@@ -84,7 +84,11 @@ describe('stats routes', () => {
     expect((await adminApi(`/sites/${id}/stats?from=2026-09-10&to=2026-09-01`, cookie)).status).toBe(400);
     expect((await adminApi(`/sites/${id}/stats?from=2020-01-01&to=2026-09-01`, cookie)).status).toBe(400);
     expect((await adminApi(`/sites/${id}/stats?from=2025-01-01&to=2026-01-01`, cookie)).status).toBe(200); // 恰好 366 天
-    expect((await adminApi(`/sites/${id}/stats?from=2025-01-01&to=2026-01-02`, cookie)).status).toBe(400); // 367 天
+    const tooLong = await adminApi(`/sites/${id}/stats?from=2025-01-01&to=2026-01-02`, cookie); // 367 天
+    expect(tooLong.status).toBe(400);
+    expect(await tooLong.json()).toEqual({
+      code: 'date_range_too_long', params: { max: 366 }, error: 'Date range can be at most 366 days',
+    });
     expect((await adminApi(`/sites/${id}/stats?from=2026-13-45`, cookie)).status).toBe(400); // 格式合法但日历非法
     expect((await adminApi(`/sites/${id}/stats?from=2026-02-01&to=2026-02-30`, cookie)).status).toBe(400); // 2 月没有 30 号
   });

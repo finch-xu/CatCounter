@@ -9,6 +9,7 @@ describe('admin auth', () => {
       body: JSON.stringify({ password: 'wrong' }),
     });
     expect(res.status).toBe(401);
+    expect(await res.json()).toMatchObject({ code: 'wrong_password', error: 'Incorrect password' });
     expect(res.headers.get('set-cookie')).toBeNull();
   });
 

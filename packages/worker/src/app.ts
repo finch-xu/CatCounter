@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { ensureSchema } from './db/schema';
 import type { Env } from './env';
 import { missingSecrets } from './lib/config';
+import { apiError } from './lib/errors';
 import { adminRoutes } from './routes/admin';
 import { publicRoutes } from './routes/public';
 
@@ -10,14 +11,14 @@ export const app = new Hono<{ Bindings: Env }>();
 app.use('/api/*', async (c, next) => {
   const names = missingSecrets(c.env);
   if (names.length > 0) {
-    return c.json({ error: '服务尚未配置：请在 Cloudflare 控制台设置 ' + names.join(' 与 ') + ' 后重新部署' }, 503);
+    return c.json(apiError('not_configured', { names: names.join(', ') }), 503);
   }
   await next();
 });
 app.use('/admin/api/*', async (c, next) => {
   const names = missingSecrets(c.env);
   if (names.length > 0) {
-    return c.json({ error: '服务尚未配置：请在 Cloudflare 控制台设置 ' + names.join(' 与 ') + ' 后重新部署' }, 503);
+    return c.json(apiError('not_configured', { names: names.join(', ') }), 503);
   }
   await next();
 });
@@ -44,5 +45,5 @@ app.get('/admin/*', (c) => {
 
 app.onError((err, c) => {
   console.error(err);
-  return c.json({ error: 'internal error' }, 500);
+  return c.json(apiError('internal_error'), 500);
 });

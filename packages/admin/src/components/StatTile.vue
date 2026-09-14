@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 defineProps<{ label: string; value: number; sub?: string }>();
+const { n } = useI18n();
 </script>
 
 <template>
   <div class="card tile">
-    <div class="value num">{{ value.toLocaleString('zh-CN') }}</div>
+    <div class="value num">{{ n(value) }}</div>
     <div class="label">{{ label }}</div>
     <div v-if="sub" class="muted sub">{{ sub }}</div>
   </div>

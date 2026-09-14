@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { SiteSummary } from '@catcounter/shared';
+import { useI18n } from 'vue-i18n';
 import logo from '../assets/logo.png';
 defineProps<{ sites: SiteSummary[] }>();
 defineEmits<{ 'open-settings': [] }>();
+const { t } = useI18n();
 </script>
 
 <template>
@@ -13,9 +15,9 @@ defineEmits<{ 'open-settings': [] }>();
     </div>
     <nav class="nav">
       <router-link :to="{ name: 'overview' }" class="nav-item" exact-active-class="active">
-        <span>总览</span>
+        <span>{{ t('sidebar.overview') }}</span>
       </router-link>
-      <div class="nav-group">站点</div>
+      <div class="nav-group">{{ t('sidebar.sites') }}</div>
       <router-link
         v-for="s in sites" :key="s.id"
         :to="{ name: 'site', params: { id: s.id } }" class="nav-item" active-class="active"
@@ -23,15 +25,15 @@ defineEmits<{ 'open-settings': [] }>();
         <span class="ellipsis">{{ s.name }}</span>
         <span class="badge num">{{ s.today.pv }}</span>
       </router-link>
-      <p v-if="sites.length === 0" class="muted empty">还没有站点</p>
+      <p v-if="sites.length === 0" class="muted empty">{{ t('sidebar.empty') }}</p>
     </nav>
     <div class="footer">
-      <div class="avatar">管</div>
+      <div class="avatar">{{ t('sidebar.avatar') }}</div>
       <div class="who">
-        <div>管理员</div>
+        <div>{{ t('sidebar.admin') }}</div>
         <div class="muted small">CatCounter</div>
       </div>
-      <button class="btn btn-ghost btn-sm" title="设置" @click="$emit('open-settings')">⚙</button>
+      <button class="btn btn-ghost btn-sm" :title="t('common.settings')" @click="$emit('open-settings')">⚙</button>
     </div>
   </aside>
 </template>

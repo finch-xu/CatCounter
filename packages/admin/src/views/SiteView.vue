@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import type { Site, SiteStats } from '@catcounter/shared';
 import BarList from '../components/BarList.vue';
@@ -16,6 +17,7 @@ const props = defineProps<{ id: string }>();
 const router = useRouter();
 const { reload } = useSites();
 const { toast } = useToast();
+const { t, n } = useI18n();
 
 type Range = '7' | '30' | '90' | 'custom';
 const range = ref<Range>('30');
@@ -25,8 +27,16 @@ const site = ref<Site | null>(null);
 const stats = ref<SiteStats | null>(null);
 const showSettings = ref(false);
 
-const DEVICE_LABELS: Record<string, string> = { desktop: '桌面', mobile: '手机', tablet: '平板' };
-const REFERRER_LABELS: Record<string, string> = { direct: '直接访问' };
+const deviceLabels = computed<Record<string, string>>(() => ({
+  desktop: t('site.deviceDesktop'), mobile: t('site.deviceMobile'), tablet: t('site.deviceTablet'),
+}));
+const referrerLabels = computed<Record<string, string>>(() => ({ direct: t('site.referrerDirect') }));
+const rangeOptions = computed(() => [
+  { label: t('site.days', { n: 7 }), value: '7' as const },
+  { label: t('site.days', { n: 30 }), value: '30' as const },
+  { label: t('site.days', { n: 90 }), value: '90' as const },
+  { label: t('site.custom'), value: 'custom' as const },
+]);
 
 function dayStr(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -50,7 +60,7 @@ async function load() {
     site.value = await api.site(props.id);
     stats.value = await api.stats(props.id, from.value, to.value);
   } catch (e) {
-    toast(e instanceof Error ? e.message : '加载失败', 'error');
+    toast(e instanceof Error ? e.message : t('common.loadFailed'), 'error');
   }
 }
 
@@ -65,64 +75,61 @@ function onUpdated(s: Site) {
 async function onDeleted() {
   showSettings.value = false;
   await reload().catch(() => undefined);
-  toast('站点已删除');
+  toast(t('site.deleted'));
   router.replace({ name: 'overview' });
 }
 </script>
 
 <template>
-  <PageHeader :title="site?.name ?? '站点'">
+  <PageHeader :title="site?.name ?? t('site.fallbackTitle')">
     <template #actions>
-      <button class="btn" :disabled="!site" @click="showSettings = true">设置</button>
+      <button class="btn" :disabled="!site" @click="showSettings = true">{{ t('common.settings') }}</button>
     </template>
   </PageHeader>
 
   <div v-if="site && stats" class="content">
     <div class="toolbar">
-      <SegmentedControl
-        v-model="range"
-        :options="[{ label: '7 天', value: '7' }, { label: '30 天', value: '30' }, { label: '90 天', value: '90' }, { label: '自定义', value: 'custom' }]"
-      />
+      <SegmentedControl v-model="range" :options="rangeOptions" />
       <div v-if="range === 'custom'" class="custom">
         <input v-model="from" class="input" type="date" />
-        <span class="muted">至</span>
+        <span class="muted">{{ t('site.to') }}</span>
         <input v-model="to" class="input" type="date" />
-        <button class="btn" @click="load">查询</button>
+        <button class="btn" @click="load">{{ t('site.apply') }}</button>
       </div>
     </div>
 
     <div class="grid-stats">
-      <StatTile label="区间 PV" :value="rangeTotals.pv" />
-      <StatTile label="区间 UV" :value="rangeTotals.uv" />
-      <StatTile label="累计 PV" :value="site.pv" />
-      <StatTile label="累计 UV" :value="site.uv" />
+      <StatTile :label="t('stats.rangePv')" :value="rangeTotals.pv" />
+      <StatTile :label="t('stats.rangeUv')" :value="rangeTotals.uv" />
+      <StatTile :label="t('stats.totalPv')" :value="site.pv" />
+      <StatTile :label="t('stats.totalUv')" :value="site.uv" />
     </div>
 
-    <div class="section-title">趋势</div>
+    <div class="section-title">{{ t('site.trend') }}</div>
     <div class="card card-pad"><TrendChart :series="stats.series" /></div>
 
-    <div class="section-title">明细</div>
+    <div class="section-title">{{ t('site.details') }}</div>
     <div class="grid-3">
       <div class="card">
         <table class="tbl">
-          <thead><tr><th>热门页面</th><th class="num">PV</th><th class="num">UV</th></tr></thead>
+          <thead><tr><th>{{ t('site.topPages') }}</th><th class="num">PV</th><th class="num">UV</th></tr></thead>
           <tbody>
             <tr v-for="p in stats.pages" :key="p.path">
               <td>
                 <div class="ellipsis" :title="p.path">{{ p.title || p.path }}</div>
                 <div class="muted small ellipsis">{{ p.path }}</div>
               </td>
-              <td class="num">{{ p.pv }}</td>
-              <td class="num">{{ p.uv }}</td>
+              <td class="num">{{ n(p.pv) }}</td>
+              <td class="num">{{ n(p.uv) }}</td>
             </tr>
-            <tr v-if="stats.pages.length === 0"><td colspan="3" class="muted">暂无数据</td></tr>
+            <tr v-if="stats.pages.length === 0"><td colspan="3" class="muted">{{ t('common.noData') }}</td></tr>
           </tbody>
         </table>
       </div>
-      <BarList title="来源" :items="stats.referrers" :labels="REFERRER_LABELS" />
+      <BarList :title="t('site.referrers')" :items="stats.referrers" :labels="referrerLabels" />
       <div class="stack">
-        <BarList title="地区" :items="stats.countries" />
-        <BarList title="设备" :items="stats.devices" :labels="DEVICE_LABELS" />
+        <BarList :title="t('site.countries')" :items="stats.countries" />
+        <BarList :title="t('site.devices')" :items="stats.devices" :labels="deviceLabels" />
       </div>
     </div>
   </div>

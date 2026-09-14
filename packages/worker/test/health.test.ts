@@ -35,6 +35,6 @@ describe('health', () => {
     const cookie = await login();
     const res = await adminApi('/bogus', cookie);
     expect(res.status).toBe(404);
-    expect(await res.json()).toEqual({ error: 'not found' });
+    expect(await res.json()).toEqual({ error: 'Not found', code: 'not_found' });
   });
 });
