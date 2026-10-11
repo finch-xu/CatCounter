@@ -21,10 +21,9 @@ export function setUnauthorizedHandler(fn: () => void): void {
  * 3. 非 JSON 响应（比如网关返回的 HTML 错误页）→ 带状态码的通用提示
  */
 function errorMessage(body: Partial<ApiErrorBody>, status: number): string {
-  const { t, te } = i18n.global;
   const key = `errors.${body.code}`;
-  if (body.code && te(key)) return t(key, body.params ?? {});
-  return body.error || t('errors.requestFailed', { status });
+  if (body.code && i18n.exists(key)) return i18n.t(key, body.params ?? {});
+  return body.error || i18n.t('errors.requestFailed', { status });
 }
 
 async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
