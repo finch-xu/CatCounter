@@ -107,6 +107,9 @@ const zhCN: MessageSchema = {
     allPages: '全部页面',
     visits: '访问次数',
     byDay: '按日',
+    from: '开始日期',
+    until: '结束日期',
+    range: '时间范围',
   },
   details: {
     title: '详细数据',

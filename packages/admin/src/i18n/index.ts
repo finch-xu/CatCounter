@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import en from './locales/en';
 import ja from './locales/ja';
 import zhCN from './locales/zh-CN';
+import type { MessageSchema } from './schema';
 
 export const LOCALES = [
   { label: 'English', value: 'en' },
@@ -51,3 +52,11 @@ void i18n.use(initReactI18next).init({
   initAsync: false,
 });
 sync(i18n.language);
+
+// 让 t() 的键有类型：拼错键名在类型检查时就报错
+declare module 'i18next' {
+  interface CustomTypeOptions {
+    defaultNS: 'translation';
+    resources: { translation: MessageSchema };
+  }
+}

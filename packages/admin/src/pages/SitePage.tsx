@@ -140,12 +140,12 @@ function SiteView({ id, rangeState }: { id: string; rangeState: ReturnType<typeo
           }}
         >
           <Input
-            type="date" aria-label={t('site.custom')} value={custom.from} max={custom.to || undefined}
+            type="date" aria-label={t('site.from')} value={custom.from} max={custom.to || undefined}
             onChange={(e) => setCustom({ ...custom, from: e.target.value })} className="h-11 w-40 bg-card"
           />
           <span className="text-muted-foreground">{t('site.to')}</span>
           <Input
-            type="date" aria-label={t('site.to')} value={custom.to} min={custom.from || undefined}
+            type="date" aria-label={t('site.until')} value={custom.to} min={custom.from || undefined}
             onChange={(e) => setCustom({ ...custom, to: e.target.value })} className="h-11 w-40 bg-card"
           />
           <Button type="submit" variant="outline" size="touch" className="bg-card" disabled={!custom.from || !custom.to}>
@@ -185,6 +185,19 @@ function SiteView({ id, rangeState }: { id: string; rangeState: ReturnType<typeo
         />
       )}
     </PageBody>
+  );
+}
+
+/** 地区：代码小标 + 本地化名称；查不到名称的代码（如 T1）只显示代码本身 */
+function RegionLabel({ code }: { code: string }) {
+  const fmt = useFormat();
+  if (!code) return <span>–</span>;
+  const name = fmt.region(code);
+  return (
+    <>
+      <span className="w-6 shrink-0 text-[11px] font-semibold tracking-wide text-series-2">{code}</span>
+      {name !== code && <span className="truncate">{name}</span>}
+    </>
   );
 }
 
@@ -324,14 +337,7 @@ function SiteCharts({ stats, detailsLink }: { stats: SiteStats; detailsLink: str
             title={t('site.countries')} hint={t('site.visits')} tone="series-2"
             items={countries.map((c) => ({
               key: c.value,
-              label: c.value ? (
-                <>
-                  <span className="w-6 shrink-0 text-[11px] font-semibold tracking-wide text-series-2">{c.value}</span>
-                  <span className="truncate">{fmt.region(c.value)}</span>
-                </>
-              ) : (
-                <span>–</span>
-              ),
+              label: <RegionLabel code={c.value} />,
               count: c.count,
               ratio: c.ratio,
             }))}

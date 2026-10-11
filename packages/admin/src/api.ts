@@ -21,8 +21,11 @@ export function setUnauthorizedHandler(fn: () => void): void {
  * 3. 非 JSON 响应（比如网关返回的 HTML 错误页）→ 带状态码的通用提示
  */
 function errorMessage(body: Partial<ApiErrorBody>, status: number): string {
-  const key = `errors.${body.code}`;
-  if (body.code && i18n.exists(key)) return i18n.t(key, body.params ?? {});
+  if (body.code) {
+    // 类型上 code 一定有对应文案；运行时仍要查一下，后端可能比前端新、带来还没翻译的错误码
+    const key = `errors.${body.code}` as const;
+    if (i18n.exists(key)) return i18n.t(key, body.params ?? {});
+  }
   return body.error || i18n.t('errors.requestFailed', { status });
 }
 

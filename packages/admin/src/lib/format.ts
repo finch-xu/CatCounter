@@ -13,14 +13,18 @@ const DATE: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', da
 const LONG: Intl.DateTimeFormatOptions = { ...DATE, hour: '2-digit', minute: '2-digit' };
 
 export function formatDate(ms: number, locale: string, style: 'date' | 'long' = 'date'): string {
+  // Intl 遇到非法时间会抛 RangeError；这里宁可显示占位符，也不让整页崩掉
+  if (!Number.isFinite(ms)) return '–';
   return new Intl.DateTimeFormat(locale, style === 'long' ? LONG : DATE).format(ms);
 }
 
 /** 'YYYY-MM-DD'（UTC 日）→ 图表坐标轴上的短日期，如 9/12 */
 export function formatDay(day: string, locale: string, withWeekday = false): string {
+  const date = new Date(`${day}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return day;
   return new Intl.DateTimeFormat(locale, {
     month: 'numeric', day: 'numeric', timeZone: 'UTC', ...(withWeekday ? { weekday: 'short' } : {}),
-  }).format(new Date(`${day}T00:00:00Z`));
+  }).format(date);
 }
 
 const UNITS: Array<[Intl.RelativeTimeFormatUnit, number]> = [
@@ -49,4 +53,15 @@ export function regionName(code: string, locale: string): string {
   } catch {
     return code;
   }
+}
+
+/**
+ * 总览页眉上的“今天”。统计里的“今日”按 UTC 日计算，所以显示 UTC 日期；
+ * 它和访问者本地的日期不是同一天时（比如东八区早上 8 点前）注明 UTC，免得看起来像显示错了。
+ */
+export function todayLabel(now: Date, locale: string, timeZone?: string): string {
+  const dayKey = (tz?: string) =>
+    new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+  const utc = new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' }).format(now);
+  return dayKey(timeZone) === dayKey('UTC') ? utc : `${utc} (UTC)`;
 }

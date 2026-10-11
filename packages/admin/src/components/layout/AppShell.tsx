@@ -1,25 +1,16 @@
 import { Menu } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useLocation } from 'react-router';
+import { Outlet } from 'react-router';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { GlobalSettingsDialog } from '@/dialogs/GlobalSettingsDialog';
 import { Brand, Sidebar } from './Sidebar';
 
-export interface ShellContext {
-  openSettings(): void;
-}
-
 export default function AppShell() {
   const { t } = useTranslation();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const { pathname } = useLocation();
-  const context = useMemo<ShellContext>(() => ({ openSettings: () => setSettingsOpen(true) }), []);
-
-  // 窄屏下点了导航项就收起抽屉
-  useEffect(() => setMenuOpen(false), [pathname]);
 
   const openSettings = () => {
     setMenuOpen(false);
@@ -43,13 +34,13 @@ export default function AppShell() {
             </button>
           </div>
           <main className="min-w-0 flex-1">
-            <Outlet context={context} />
+            <Outlet />
           </main>
         </div>
         <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
           <SheetContent side="left" aria-describedby={undefined} className="w-auto gap-0 p-0">
             <SheetTitle className="sr-only">{t('common.menu')}</SheetTitle>
-            <Sidebar className="flex h-full border-r-0" onOpenSettings={openSettings} />
+            <Sidebar className="flex h-full border-r-0" onOpenSettings={openSettings} onNavigate={() => setMenuOpen(false)} />
           </SheetContent>
         </Sheet>
         <GlobalSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />

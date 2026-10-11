@@ -10,7 +10,7 @@ export function RangeControl({ value, onChange }: { value: Range; onChange(range
     ...PRESET_RANGES.map((r) => ({ value: r, label: t('site.days', { n: Number(r) }) })),
     { value: 'custom', label: t('site.custom'), icon: <Calendar aria-hidden="true" className="size-4" /> },
   ], [t]);
-  return <Segmented value={value} onChange={onChange} options={options} label={t('site.trend')} />;
+  return <Segmented value={value} onChange={onChange} options={options} label={t('site.range')} />;
 }
 
 /** 范围按钮上显示的文字，页头说明行也会用到 */

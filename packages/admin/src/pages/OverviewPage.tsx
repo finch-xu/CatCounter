@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NewSiteDialog } from '@/dialogs/NewSiteDialog';
 import { useFormat } from '@/hooks/useFormat';
+import { todayLabel } from '@/lib/format';
 import { useLocale } from '@/hooks/useLocale';
 import { useTheme } from '@/hooks/useTheme';
 import { dailyAverage, peakDay, share, sumSeries, viewsPerVisitor, weekOverWeek } from '@/lib/metrics';
@@ -29,7 +30,7 @@ export default function OverviewPage() {
   const { resolved, toggle } = useTheme();
   const { data, isPending, isError, error, refetch } = useOverview();
   const [newOpen, setNewOpen] = useState(false);
-  const today = useMemo(() => new Intl.DateTimeFormat(locale, { dateStyle: 'full' }).format(new Date()), [locale]);
+  const today = useMemo(() => todayLabel(new Date(), locale), [locale]);
 
   return (
     <PageBody>

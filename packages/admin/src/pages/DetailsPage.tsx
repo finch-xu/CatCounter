@@ -1,6 +1,6 @@
 import type { PageStatsRow, PageStatsSort } from '@catcounter/shared';
 import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Info, Search } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 import { PageBody, PageHeader } from '@/components/layout/PageHeader';
@@ -59,12 +59,15 @@ export default function DetailsPage() {
     setParams(toSearchParams(applyPatch({ ...filters, q: qInput.trim() }, patch)), { replace: true });
   }
 
+  // 定时器到点时要用当时最新的筛选条件，而不是输入那一刻的
+  const updateRef = useRef(update);
+  updateRef.current = update;
+
   // 搜索防抖 300ms；依赖变化时清掉上一个定时器，卸载时同理
   useEffect(() => {
     if (composing || qInput.trim() === filters.q) return;
-    const timer = setTimeout(() => update({}), 300);
+    const timer = setTimeout(() => updateRef.current({}), 300);
     return () => clearTimeout(timer);
-    // update 每次渲染都是新函数，这里只关心输入内容、已生效的搜索词和组字状态
   }, [qInput, filters.q, composing]);
 
   const enabled = Boolean(filters.from && filters.to);
@@ -78,6 +81,12 @@ export default function DetailsPage() {
   const data = query.data;
   const pageCount = Math.max(1, Math.ceil((data?.total ?? 0) / PAGE_SIZE));
   const offset = (filters.page - 1) * PAGE_SIZE;
+
+  // 页码超出范围（手改地址栏，或筛选后结果变少）时回到最后一页
+  const pageTooFar = Boolean(data) && !query.isPlaceholderData && filters.page > pageCount;
+  useEffect(() => {
+    if (pageTooFar) updateRef.current({ page: pageCount });
+  }, [pageTooFar, pageCount]);
 
   const { chips, rest } = useMemo(() => {
     const groups = [...(data?.groups ?? [])].sort((a, b) => b.count - a.count);
@@ -148,39 +157,41 @@ export default function DetailsPage() {
             }}
           >
             <Input
-              type="date" aria-label={t('site.custom')} value={fromInput} max={toInput || undefined}
+              type="date" aria-label={t('site.from')} value={fromInput} max={toInput || undefined}
               onChange={(e) => setFromInput(e.target.value)} className="h-11 w-40"
             />
             <span className="text-muted-foreground">{t('site.to')}</span>
             <Input
-              type="date" aria-label={t('site.to')} value={toInput} min={fromInput || undefined}
+              type="date" aria-label={t('site.until')} value={toInput} min={fromInput || undefined}
               onChange={(e) => setToInput(e.target.value)} className="h-11 w-40"
             />
             <Button type="submit" variant="outline" size="touch" disabled={!fromInput || !toInput}>{t('site.apply')}</Button>
           </form>
         )}
 
-        {chips.length > 0 && (
-          <div role="group" aria-label={t('details.group')} className="flex flex-wrap items-center gap-2 text-[13px]">
-            <span className="pr-0.5 text-muted-foreground">{t('details.group')}</span>
-            <GroupChip active={!filters.group} onClick={() => update({ group: '' })}>{t('details.groupAll')}</GroupChip>
-            {chips.map((g) => (
-              <GroupChip key={g.prefix} active={filters.group === g.prefix} onClick={() => update({ group: g.prefix })}>
-                {g.prefix} <span className="num opacity-70">{fmt.n(g.count)}</span>
-              </GroupChip>
-            ))}
-            {rest.length > 0 && (
-              <Select value={rest.some((g) => g.prefix === filters.group) ? filters.group : ''} onValueChange={(group) => update({ group })}>
-                <SelectTrigger size="sm" aria-label={t('common.more')} className="rounded-full bg-card data-[size=sm]:h-8">
-                  <SelectValue placeholder={t('common.more')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {rest.map((g) => <SelectItem key={g.prefix} value={g.prefix}>{g.prefix} ({fmt.n(g.count)})</SelectItem>)}
-                </SelectContent>
-              </Select>
-            )}
-          </div>
-        )}
+        {/* 这一行始终渲染：数据回来前就占好位置，胶囊出现时不会把下面的表格顶下去 */}
+        <div
+          role="group" aria-label={t('details.group')}
+          className={cn('flex flex-wrap items-center gap-2 text-[13px] transition-opacity', query.isPlaceholderData && 'opacity-60')}
+        >
+          <span className="pr-0.5 text-muted-foreground">{t('details.group')}</span>
+          <GroupChip active={!filters.group} onClick={() => update({ group: '' })}>{t('details.groupAll')}</GroupChip>
+          {chips.map((g) => (
+            <GroupChip key={g.prefix} active={filters.group === g.prefix} onClick={() => update({ group: g.prefix })}>
+              {g.prefix} <span className="num opacity-70">{fmt.n(g.count)}</span>
+            </GroupChip>
+          ))}
+          {rest.length > 0 && (
+            <Select value={rest.some((g) => g.prefix === filters.group) ? filters.group : ''} onValueChange={(group) => update({ group })}>
+              <SelectTrigger size="sm" aria-label={t('common.more')} className="rounded-full bg-card data-[size=sm]:h-8">
+                <SelectValue placeholder={t('common.more')} />
+              </SelectTrigger>
+              <SelectContent>
+                {rest.map((g) => <SelectItem key={g.prefix} value={g.prefix}>{g.prefix} ({fmt.n(g.count)})</SelectItem>)}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
       </Panel>
 
       {query.isError ? (
@@ -222,7 +233,7 @@ export default function DetailsPage() {
               </tbody>
             </table>
           </div>
-          {data && data.total > 0 && (
+          {data && data.rows.length > 0 && (
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-grid bg-muted px-5 py-2.5 text-[13px] tabular-nums text-subtle">
               <span>{t('details.rows', { from: fmt.n(offset + 1), to: fmt.n(offset + data.rows.length), total: fmt.n(data.total) })}</span>
               {pageCount > 1 && (

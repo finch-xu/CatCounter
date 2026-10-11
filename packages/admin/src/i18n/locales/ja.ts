@@ -107,6 +107,9 @@ const ja: MessageSchema = {
     allPages: 'すべてのページ',
     visits: 'アクセス数',
     byDay: '日別',
+    from: '開始日',
+    until: '終了日',
+    range: '期間',
   },
   details: {
     title: '詳細データ',

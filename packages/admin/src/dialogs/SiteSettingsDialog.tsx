@@ -1,5 +1,5 @@
 import type { PageRow, Site, Token } from '@catcounter/shared';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { TabbedDialog } from '@/components/TabbedDialog';
@@ -43,13 +43,13 @@ export function SiteSettingsDialog({ site, open, onOpenChange, onDelete, deletin
   const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>('basic');
 
-  // 每次打开都回到第一个分页；各分页用 key 重建，表单回到站点当前的值
-  const [session, setSession] = useState(0);
-  useEffect(() => {
-    if (!open) return;
-    setTab('basic');
-    setSession((n) => n + 1);
-  }, [open]);
+  // 每次打开都回到第一个分页。在渲染阶段比较上一次的 open 来重置，这样重新打开的第一帧就是对的；
+  // 各分页的表单状态不用管：弹窗关闭时内容整体卸载，再打开就是从站点当前的值开始
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) setTab('basic');
+  }
 
   return (
     <TabbedDialog<Tab>
@@ -60,10 +60,10 @@ export function SiteSettingsDialog({ site, open, onOpenChange, onDelete, deletin
       onValueChange={setTab}
       className="h-[min(640px,85vh)] sm:max-w-[1000px]"
       tabs={[
-        { value: 'basic', label: t('siteSettings.tabBasic'), content: <BasicTab key={session} site={site} /> },
-        { value: 'tokens', label: t('siteSettings.tabTokens'), content: <TokensTab key={session} site={site} enabled={open} /> },
-        { value: 'counters', label: t('siteSettings.tabCounters'), content: <CountersTab key={session} site={site} /> },
-        { value: 'danger', label: t('siteSettings.tabDanger'), content: <DangerTab key={session} site={site} onDelete={onDelete} deleting={deleting} /> },
+        { value: 'basic', label: t('siteSettings.tabBasic'), content: <BasicTab site={site} /> },
+        { value: 'tokens', label: t('siteSettings.tabTokens'), content: <TokensTab site={site} enabled={open} /> },
+        { value: 'counters', label: t('siteSettings.tabCounters'), content: <CountersTab site={site} /> },
+        { value: 'danger', label: t('siteSettings.tabDanger'), content: <DangerTab site={site} onDelete={onDelete} deleting={deleting} /> },
       ]}
     />
   );
@@ -276,7 +276,10 @@ function CountersTab({ site }: { site: Site }) {
           className="flex flex-wrap gap-2"
           onSubmit={(e) => {
             e.preventDefault();
-            setSubmitted(queryInput.trim());
+            const term = queryInput.trim();
+            // 关键词没变时查询键也不变，要显式重新请求（比如刚改完计数想看最新的）
+            if (term === submitted) void pages.refetch();
+            else setSubmitted(term);
           }}
         >
           <Input

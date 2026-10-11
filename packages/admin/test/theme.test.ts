@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { loadTheme, setTheme } from '@/hooks/useTheme';
+import { act, renderHook } from '@testing-library/react';
+import { loadTheme, setTheme, useTheme } from '@/hooks/useTheme';
 import { loadLocale } from '@/i18n';
 
 describe('主题', () => {
@@ -27,6 +28,21 @@ describe('主题', () => {
     expect(loadLocale()).toBe('en');
     get.mockRestore();
     set.mockRestore();
+  });
+});
+
+describe('useTheme', () => {
+  it('toggle 在当前实际显示的深浅色之间切换，并通知所有使用方', () => {
+    setTheme('system');
+    const a = renderHook(() => useTheme());
+    const b = renderHook(() => useTheme());
+    expect(a.result.current.resolved).toBe('light');
+    act(() => a.result.current.toggle());
+    expect(a.result.current.theme).toBe('dark');
+    expect(b.result.current.theme).toBe('dark');
+    act(() => b.result.current.toggle());
+    expect(a.result.current.theme).toBe('light');
+    setTheme('system');
   });
 });
 

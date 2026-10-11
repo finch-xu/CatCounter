@@ -21,7 +21,14 @@ export function Brand({ className }: { className?: string }) {
   );
 }
 
-export function Sidebar({ className, onOpenSettings }: { className?: string; onOpenSettings: () => void }) {
+interface SidebarProps {
+  className?: string;
+  onOpenSettings(): void;
+  /** 点了任意导航项时调用（包括当前页那一项）；抽屉用它来收起自己 */
+  onNavigate?(): void;
+}
+
+export function Sidebar({ className, onOpenSettings, onNavigate }: SidebarProps) {
   const { t } = useTranslation();
   const fmt = useFormat();
   const { data, isPending } = useOverview();
@@ -31,11 +38,11 @@ export function Sidebar({ className, onOpenSettings }: { className?: string; onO
     <aside className={cn('w-62 shrink-0 flex-col gap-1 border-r bg-muted px-3.5 pb-3.5 pt-5', className)}>
       <Brand className="px-2 pb-4.5" />
       <nav aria-label={t('common.menu')} className="flex flex-col gap-0.5">
-        <NavLink to="/" end className={linkClass}>
+        <NavLink to="/" end className={linkClass} onClick={onNavigate}>
           <LayoutDashboard aria-hidden="true" className="size-4.5" />
           <span>{t('sidebar.overview')}</span>
         </NavLink>
-        <NavLink to="/details" className={linkClass}>
+        <NavLink to="/details" className={linkClass} onClick={onNavigate}>
           <Table2 aria-hidden="true" className="size-4.5" />
           <span>{t('sidebar.details')}</span>
         </NavLink>
@@ -48,7 +55,7 @@ export function Sidebar({ className, onOpenSettings }: { className?: string; onO
       <nav aria-label={t('sidebar.sites')} className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto">
         {isPending && [0, 1, 2].map((i) => <Skeleton key={i} className="mx-3 my-2.5 h-5" />)}
         {sites.map((s, i) => (
-          <NavLink key={s.id} to={`/sites/${s.id}`} className={linkClass}>
+          <NavLink key={s.id} to={`/sites/${s.id}`} className={linkClass} onClick={onNavigate}>
             <SiteDot index={i} />
             <span className="min-w-0 flex-1 truncate">{s.name}</span>
             <span className="num text-xs opacity-80">{fmt.n(s.today.pv)}</span>

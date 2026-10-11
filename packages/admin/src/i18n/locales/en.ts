@@ -106,6 +106,9 @@ export default {
     allPages: 'All pages',
     visits: 'Visits',
     byDay: 'Daily',
+    from: 'Start date',
+    until: 'End date',
+    range: 'Date range',
   },
   details: {
     title: 'Details',
