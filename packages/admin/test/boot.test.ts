@@ -47,6 +47,12 @@ function contrast(a: string, b: string): number {
 }
 
 describe('设计令牌', () => {
+  it('文字用霞鹜文楷、纯数字用系统字体，并且不做算法描粗', () => {
+    expect(css).toContain('--font-sans: "LXGW WenKai Screen", system-ui, sans-serif;');
+    expect(css).toContain('--font-num: system-ui, sans-serif;');
+    // 文楷只有一个字重，浏览器硬描出来的粗体会糊
+    expect(css).toContain('font-synthesis-weight: none;');
+  });
   it('浅色与深色下主按钮文字对比度都不低于 4.5:1', () => {
     const primaries = [...css.matchAll(/--primary: (#[0-9a-f]{6});/g)].map((m) => m[1]!);
     const foregrounds = [...css.matchAll(/--primary-foreground: (#[0-9a-f]{6});/g)].map((m) => m[1]!);

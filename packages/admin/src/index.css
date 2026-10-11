@@ -11,7 +11,8 @@
 }
 
 @theme inline {
-  --font-sans: system-ui, sans-serif;
+  /* 文字用霞鹜文楷（屏幕阅读版），按字符分片按需加载；数字单独用系统字体，见下面的 num 工具类 */
+  --font-sans: "LXGW WenKai Screen", system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --font-serif: ui-serif, 'Iowan Old Style', Georgia, serif;
   --font-num: system-ui, sans-serif;
@@ -192,8 +193,14 @@
   body {
     @apply bg-background text-foreground font-sans text-sm antialiased;
     line-height: 1.5;
+    /* 文楷只有一个字重：不让浏览器硬描粗体，层次靠字号和颜色 */
+    font-synthesis-weight: none;
   }
   button:not(:disabled), [role="button"]:not(:disabled) {
     cursor: pointer;
+  }
+  /* 图表坐标轴刻度是纯数字和日期，用数字字体（Recharts 不会把字体属性透传到刻度上） */
+  .recharts-cartesian-axis-tick-value {
+    font-family: var(--font-num);
   }
 }

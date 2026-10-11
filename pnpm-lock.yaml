@@ -35,6 +35,9 @@ importers:
       lucide-react:
         specifier: ^1.55.0
         version: 1.55.0(@types/react@19.3.0)(react@19.3.0)
+      lxgw-wenkai-screen-web:
+        specifier: ^1.522.0
+        version: 1.522.0
       radix-ui:
         specifier: ^1.7.0
         version: 1.7.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -2963,6 +2966,9 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  lxgw-wenkai-screen-web@1.522.0:
+    resolution: {integrity: sha512-LH1nDJz9prHgMYNKErg8XpDEIhs9+1bf6hPVKviy29be1r6Z4AXXbo9uuwmOH2hAzKMbe3kZ5+rzJ9zb/58+jw==}
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -6429,6 +6435,8 @@ snapshots:
       react: 19.3.0
     optionalDependencies:
       '@types/react': 19.3.0
+
+  lxgw-wenkai-screen-web@1.522.0: {}
 
   lz-string@1.5.0: {}
 
