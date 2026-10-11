@@ -26,7 +26,6 @@ const ja: MessageSchema = {
     toggleTheme: 'ライト / ダークを切り替え',
   },
   stats: {
-    sites: 'サイト',
     todayPv: '今日の PV',
     todayUv: '今日の UV',
     totalPv: '累計 PV',
@@ -67,7 +66,6 @@ const ja: MessageSchema = {
   overview: {
     title: '概要',
     newSite: 'サイトを追加',
-    last30Days: '過去 30 日間（全サイト）',
     sites: 'サイト',
     empty: 'まだサイトがありません。右上の「新規サイト」から追加してください。',
     trendTitle: '過去30日の推移',
@@ -92,7 +90,6 @@ const ja: MessageSchema = {
     to: '〜',
     apply: '表示',
     trend: '推移',
-    details: '詳細',
     topPages: '人気ページ',
     referrers: '参照元',
     countries: '地域',
@@ -114,7 +111,6 @@ const ja: MessageSchema = {
     allSites: 'すべてのサイト',
     site: 'サイト',
     searchPlaceholder: 'タイトルまたはパスで検索',
-    allGroups: 'すべてのグループ',
     total_zero: 'ページなし',
     total_one: '全 1 ページ',
     total_other: '全 {count} ページ',

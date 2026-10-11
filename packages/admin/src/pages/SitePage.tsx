@@ -1,6 +1,7 @@
 import type { Site, SiteStats } from '@catcounter/shared';
 import { ChevronRight, Globe, Monitor, SlidersHorizontal, Smartphone, Tablet } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -23,9 +24,9 @@ import { useFormat } from '@/hooks/useFormat';
 import { presetDates, type Range } from '@/lib/dateRange';
 import { dailyAverage, peakDay, share, sumSeries, withRatios } from '@/lib/metrics';
 import { cn } from '@/lib/utils';
-import { useOverview, useSite, useSiteStats } from '@/queries';
+import { forgetSite, useOverview, useSite, useSiteStats } from '@/queries';
 
-const DEVICE_COLORS = ['var(--brand)', 'var(--series-2)', '#e3b34d', '#7d9a78'];
+const DEVICE_COLORS = ['var(--brand)', 'var(--series-2)', 'var(--site-3)', 'var(--site-4)'];
 const DEVICE_ICONS = { desktop: Monitor, mobile: Smartphone, tablet: Tablet } as const;
 
 export default function SitePage() {
@@ -57,7 +58,15 @@ function SiteView({ id }: { id: string }) {
     else setApplied(presetDates(next));
   }
 
+  // 站点被删除后，等本页卸载再清它的缓存，避免还挂载着的查询去请求已删除的站点
+  const queryClient = useQueryClient();
+  const deleted = useRef(false);
+  useEffect(() => () => {
+    if (deleted.current) forgetSite(queryClient, id);
+  }, [queryClient, id]);
+
   function onDeleted() {
+    deleted.current = true;
     setSettingsOpen(false);
     toast(t('site.deleted'));
     navigate('/', { replace: true });

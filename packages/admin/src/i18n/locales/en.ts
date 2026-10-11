@@ -25,7 +25,6 @@ export default {
     toggleTheme: 'Toggle light / dark',
   },
   stats: {
-    sites: 'Sites',
     todayPv: 'Today PV',
     todayUv: 'Today UV',
     totalPv: 'Total PV',
@@ -66,7 +65,6 @@ export default {
   overview: {
     title: 'Overview',
     newSite: 'New site',
-    last30Days: 'Last 30 days (all sites)',
     sites: 'Sites',
     empty: 'No sites yet. Click “New site” in the top right to add one.',
     trendTitle: 'Last 30 days',
@@ -91,7 +89,6 @@ export default {
     to: 'to',
     apply: 'Apply',
     trend: 'Trend',
-    details: 'Details',
     topPages: 'Top pages',
     referrers: 'Referrers',
     countries: 'Countries',
@@ -113,7 +110,6 @@ export default {
     allSites: 'All sites',
     site: 'Site',
     searchPlaceholder: 'Search title or path',
-    allGroups: 'All groups',
     total_zero: 'No pages',
     total_one: '1 page',
     total_other: '{count} pages',

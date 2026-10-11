@@ -185,7 +185,7 @@ Admin panel translations live in `packages/admin/src/i18n/locales/`. `en.ts` is 
 packages/shared   Types and path normalization
 packages/worker   Hono app, D1, cron, static assets
 packages/sdk      Browser script, built to worker/assets/catcounter.js
-packages/admin    Vue 3 admin panel, built to worker/assets/admin
+packages/admin    React admin panel, built to worker/assets/admin
 ```
 
 ## License

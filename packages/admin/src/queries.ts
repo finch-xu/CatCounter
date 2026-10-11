@@ -84,11 +84,15 @@ export function useDeleteSite(id: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () => api.deleteSite(id),
-    onSuccess: () => {
-      qc.removeQueries({ queryKey: qk.site(id) });
-      return qc.invalidateQueries({ queryKey: qk.overview });
-    },
+    // 这里不移除该站点的查询：站点页此时还挂载着，移除会让它立刻重新请求一个已删除的站点。
+    // 缓存由站点页卸载时调用 forgetSite 清理。
+    onSuccess: () => qc.invalidateQueries({ queryKey: qk.overview }),
   });
+}
+
+/** 清掉某个站点的全部缓存（站点已删除、页面已离开后调用） */
+export function forgetSite(qc: QueryClient, id: string): void {
+  for (const scope of ['site', 'stats', 'tokens', 'pages']) qc.removeQueries({ queryKey: [scope, id] });
 }
 
 export function useCreateToken(id: string) {

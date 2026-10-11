@@ -86,6 +86,12 @@
   --series-2-soft: #dfe8ee;
   --positive: #2a6240;
   --positive-soft: #e6f1e8;
+  --site-1: #d97757;
+  --site-2: #2f5d7c;
+  --site-3: #e3b34d;
+  --site-4: #7d9a78;
+  --site-5: #8a6fa8;
+  --site-6: #5b8f8f;
   --shadow-card: 0 1px 2px rgb(31 30 29 / 0.04);
   color-scheme: light;
 }
@@ -119,6 +125,12 @@
   --series-2-soft: #263845;
   --positive: #8fc7a3;
   --positive-soft: #22342a;
+  --site-1: #d97757;
+  --site-2: #7fb0cf;
+  --site-3: #e3b34d;
+  --site-4: #9bbb95;
+  --site-5: #b29ccb;
+  --site-6: #7fb5b5;
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3);
   color-scheme: dark;
 }
@@ -153,6 +165,12 @@
     --series-2-soft: #263845;
     --positive: #8fc7a3;
     --positive-soft: #22342a;
+    --site-1: #d97757;
+    --site-2: #7fb0cf;
+    --site-3: #e3b34d;
+    --site-4: #9bbb95;
+    --site-5: #b29ccb;
+    --site-6: #7fb5b5;
     --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3);
     color-scheme: dark;
   }

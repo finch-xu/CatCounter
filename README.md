@@ -185,7 +185,7 @@ pnpm build                        # 构建 SDK 和后台到 packages/worker/asse
 packages/shared   类型与路径规范化
 packages/worker   Hono 应用、D1、cron、静态资源
 packages/sdk      浏览器脚本，构建到 worker/assets/catcounter.js
-packages/admin    Vue 3 后台，构建到 worker/assets/admin
+packages/admin    React 后台，构建到 worker/assets/admin
 ```
 
 ## 许可证

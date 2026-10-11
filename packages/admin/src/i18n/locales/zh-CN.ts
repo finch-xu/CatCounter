@@ -26,7 +26,6 @@ const zhCN: MessageSchema = {
     toggleTheme: '切换深浅色',
   },
   stats: {
-    sites: '站点',
     todayPv: '今日 PV',
     todayUv: '今日 UV',
     totalPv: '累计 PV',
@@ -67,7 +66,6 @@ const zhCN: MessageSchema = {
   overview: {
     title: '总览',
     newSite: '新建站点',
-    last30Days: '近 30 天（全部站点）',
     sites: '站点',
     empty: '还没有站点，点击右上角新建。',
     trendTitle: '近 30 天趋势',
@@ -92,7 +90,6 @@ const zhCN: MessageSchema = {
     to: '至',
     apply: '查询',
     trend: '趋势',
-    details: '明细',
     topPages: '热门页面',
     referrers: '来源',
     countries: '地区',
@@ -114,7 +111,6 @@ const zhCN: MessageSchema = {
     allSites: '全部站点',
     site: '站点',
     searchPlaceholder: '搜索标题或路径',
-    allGroups: '全部分组',
     total_zero: '没有页面',
     total_one: '共 1 个页面',
     total_other: '共 {count} 个页面',

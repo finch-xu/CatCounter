@@ -185,7 +185,7 @@ curl で訪問をシミュレートする場合は、`-A 'Mozilla/5.0 (Macintosh
 packages/shared   型定義とパスの正規化
 packages/worker   Hono アプリ、D1、cron、静的アセット
 packages/sdk      ブラウザ用スクリプト、worker/assets/catcounter.js にビルド
-packages/admin    Vue 3 の管理画面、worker/assets/admin にビルド
+packages/admin    React の管理画面、worker/assets/admin にビルド
 ```
 
 ## ライセンス
