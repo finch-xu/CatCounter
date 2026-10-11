@@ -165,7 +165,7 @@ export default {
     path: 'Path',
     pageCountersUpdated: 'Page counts updated',
     deleteWarning: 'Deleting a site removes all of its counts, daily data and tokens. This cannot be undone.',
-    deleteConfirm: 'Type the site name {name} to confirm',
+    deleteConfirm: 'Type the site name <name/> to confirm',
     deleteSite: 'Delete site',
   },
   settings: {

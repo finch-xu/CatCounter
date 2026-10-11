@@ -166,7 +166,7 @@ const zhCN: MessageSchema = {
     path: '路径',
     pageCountersUpdated: '已更新页面计数',
     deleteWarning: '删除站点会移除它的全部计数、按日数据和 token，且无法恢复。',
-    deleteConfirm: '输入站点名称 {name} 以确认',
+    deleteConfirm: '输入站点名称 <name/> 以确认',
     deleteSite: '删除站点',
   },
   settings: {

@@ -166,7 +166,7 @@ const ja: MessageSchema = {
     path: 'パス',
     pageCountersUpdated: 'ページのカウントを更新しました',
     deleteWarning: 'サイトを削除すると、すべてのカウント、日別データ、トークンが削除されます。この操作は元に戻せません。',
-    deleteConfirm: '確認のため、サイト名 {name} を入力してください',
+    deleteConfirm: '確認のため、サイト名 <name/> を入力してください',
     deleteSite: 'サイトを削除',
   },
   settings: {
