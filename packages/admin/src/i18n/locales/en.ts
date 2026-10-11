@@ -37,6 +37,7 @@ export default {
     last30: 'Last 30 days +{n}',
     todayPlus: 'Today +{n}',
     wow: 'Last 7 days vs previous 7',
+    wowShort: '7d',
   },
   login: {
     subtitle: 'Enter the admin password to continue',

@@ -38,6 +38,7 @@ const ja: MessageSchema = {
     last30: '過去30日 +{n}',
     todayPlus: '今日 +{n}',
     wow: '直近7日と前の7日の比較',
+    wowShort: '7日',
   },
   login: {
     subtitle: '管理者パスワードを入力してください',

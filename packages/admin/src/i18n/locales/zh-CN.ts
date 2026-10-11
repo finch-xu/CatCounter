@@ -38,6 +38,7 @@ const zhCN: MessageSchema = {
     last30: '近 30 天 +{n}',
     todayPlus: '今日 +{n}',
     wow: '近 7 日较前 7 日',
+    wowShort: '7 日',
   },
   login: {
     subtitle: '输入管理员密码进入后台',
