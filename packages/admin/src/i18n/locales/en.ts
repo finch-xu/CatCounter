@@ -23,6 +23,8 @@ export default {
     menu: 'Menu',
     more: 'More',
     toggleTheme: 'Toggle light / dark',
+    unexpectedError: 'Something went wrong.',
+    reload: 'Reload',
   },
   stats: {
     todayPv: 'Today PV',

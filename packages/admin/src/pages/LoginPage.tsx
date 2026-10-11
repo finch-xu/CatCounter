@@ -1,5 +1,6 @@
 import { Check, Eye, EyeOff, Lock } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 import logo from '@/assets/logo.png';
@@ -37,6 +38,9 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const login = useLogin();
+  // 到了登录页就说明上一段会话结束了（主动退出或过期），把它留下的数据清掉
+  const queryClient = useQueryClient();
+  useEffect(() => queryClient.clear(), [queryClient]);
   const [password, setPassword] = useState('');
   const [visible, setVisible] = useState(false);
 

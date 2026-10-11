@@ -24,7 +24,7 @@ export function NewSiteDialog({ open, onOpenChange }: { open: boolean; onOpenCha
     setOriginsText('');
     setResult(null);
     create.reset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // 只在打开的那一刻重置；create 每次渲染都是新对象，不能放进依赖
   }, [open]);
 
   function submit(e: React.FormEvent) {

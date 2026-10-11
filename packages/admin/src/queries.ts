@@ -53,15 +53,19 @@ export function useLogin() {
 
 export function useLogout() {
   const qc = useQueryClient();
-  // 即使请求失败也清理本地状态
-  return useMutation({ mutationFn: () => api.logout().catch(() => undefined), onSettled: () => qc.clear() });
+  // 即使请求失败也当作已退出。这里只忘掉“已登录”，不清空整个缓存：
+  // 外壳此刻还挂载着，清空会让它立刻再发一轮注定 401 的请求。其余缓存由登录页挂载时清掉。
+  return useMutation({
+    mutationFn: () => api.logout().catch(() => undefined),
+    onSettled: () => qc.removeQueries({ queryKey: qk.me }),
+  });
 }
 
 export function useCreateSite() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (body: { name: string; origins: string[] }) => api.createSite(body),
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.overview }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: qk.overview }),
   });
 }
 
@@ -69,9 +73,12 @@ function useSiteWrite<V>(id: string, fn: (v: V) => Promise<Site>) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: fn,
+    // 刷新在后台进行，不让“已保存”的反馈等它
     onSuccess: (site) => {
       qc.setQueryData(qk.site(id), site);
-      return qc.invalidateQueries({ queryKey: qk.overview });
+      void qc.invalidateQueries({ queryKey: qk.overview });
+      // 站点名是明细表里的一列
+      void qc.invalidateQueries({ queryKey: ['pageStats'] });
     },
   });
 }
@@ -86,7 +93,10 @@ export function useDeleteSite(id: string) {
     mutationFn: () => api.deleteSite(id),
     // 这里不移除该站点的查询：站点页此时还挂载着，移除会让它立刻重新请求一个已删除的站点。
     // 缓存由站点页卸载时调用 forgetSite 清理。
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.overview }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.overview });
+      void qc.invalidateQueries({ queryKey: ['pageStats'] });
+    },
   });
 }
 
@@ -99,7 +109,7 @@ export function useCreateToken(id: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (name: string) => api.createToken(id, name),
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.tokens(id) }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: qk.tokens(id) }),
   });
 }
 
@@ -107,7 +117,7 @@ export function useRevokeToken(id: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (tid: string) => api.revokeToken(id, tid),
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.tokens(id) }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: qk.tokens(id) }),
   });
 }
 
@@ -115,10 +125,8 @@ export function useSetPageCounters(id: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (v: { path: string } & Partial<Counts>) => api.setPageCounters(id, v.path, { pv: v.pv, uv: v.uv }),
-    onSuccess: () => Promise.all([
-      qc.invalidateQueries({ queryKey: ['pages', id] }),
-      qc.invalidateQueries({ queryKey: ['pageStats'] }),
-      qc.invalidateQueries({ queryKey: ['stats', id] }),
-    ]),
+    onSuccess: () => {
+      for (const scope of [['pages', id], ['pageStats'], ['stats', id]]) void qc.invalidateQueries({ queryKey: scope });
+    },
   });
 }

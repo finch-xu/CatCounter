@@ -24,6 +24,8 @@ const zhCN: MessageSchema = {
     menu: '菜单',
     more: '更多',
     toggleTheme: '切换深浅色',
+    unexpectedError: '页面出错了。',
+    reload: '重新加载',
   },
   stats: {
     todayPv: '今日 PV',

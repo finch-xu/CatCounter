@@ -15,8 +15,7 @@ import { useFormat } from '@/hooks/useFormat';
 import { copyText, snippetFor } from '@/lib/snippet';
 import { cn } from '@/lib/utils';
 import {
-  useCreateToken, useDeleteSite, usePageSearch, useRevokeToken, useSetPageCounters, useSetSiteCounters,
-  useTokens, useUpdateSite,
+  useCreateToken, usePageSearch, useRevokeToken, useSetPageCounters, useSetSiteCounters, useTokens, useUpdateSite,
 } from '@/queries';
 
 type Tab = 'basic' | 'tokens' | 'counters' | 'danger';
@@ -25,7 +24,9 @@ interface Props {
   site: Site;
   open: boolean;
   onOpenChange(open: boolean): void;
-  onDeleted(): void;
+  /** 删除由站点页执行，弹窗只负责确认 */
+  onDelete(): void;
+  deleting: boolean;
 }
 
 /** 空输入表示不修改该项 */
@@ -38,7 +39,7 @@ function useFail() {
   return (e: unknown) => toast.error(e instanceof Error && e.message ? e.message : t('common.operationFailed'));
 }
 
-export function SiteSettingsDialog({ site, open, onOpenChange, onDeleted }: Props) {
+export function SiteSettingsDialog({ site, open, onOpenChange, onDelete, deleting }: Props) {
   const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>('basic');
 
@@ -62,7 +63,7 @@ export function SiteSettingsDialog({ site, open, onOpenChange, onDeleted }: Prop
         { value: 'basic', label: t('siteSettings.tabBasic'), content: <BasicTab key={session} site={site} /> },
         { value: 'tokens', label: t('siteSettings.tabTokens'), content: <TokensTab key={session} site={site} enabled={open} /> },
         { value: 'counters', label: t('siteSettings.tabCounters'), content: <CountersTab key={session} site={site} /> },
-        { value: 'danger', label: t('siteSettings.tabDanger'), content: <DangerTab key={session} site={site} onDeleted={onDeleted} /> },
+        { value: 'danger', label: t('siteSettings.tabDanger'), content: <DangerTab key={session} site={site} onDelete={onDelete} deleting={deleting} /> },
       ]}
     />
   );
@@ -317,17 +318,15 @@ function CountersTab({ site }: { site: Site }) {
   );
 }
 
-function DangerTab({ site, onDeleted }: { site: Site; onDeleted(): void }) {
+function DangerTab({ site, onDelete, deleting }: { site: Site; onDelete(): void; deleting: boolean }) {
   const { t } = useTranslation();
-  const fail = useFail();
-  const remove = useDeleteSite(site.id);
   const [confirmName, setConfirmName] = useState('');
   return (
     <form
       className="flex flex-col gap-4"
       onSubmit={(e) => {
         e.preventDefault();
-        remove.mutate(undefined, { onSuccess: onDeleted, onError: fail });
+        onDelete();
       }}
     >
       <p>{t('siteSettings.deleteWarning')}</p>
@@ -338,7 +337,7 @@ function DangerTab({ site, onDeleted }: { site: Site; onDeleted(): void }) {
         <Input id="ss-confirm" value={confirmName} onChange={(e) => setConfirmName(e.target.value)} autoComplete="off" className="h-10" />
       </Field>
       <div>
-        <Button type="submit" variant="destructive" size="lg" disabled={remove.isPending || confirmName !== site.name}>
+        <Button type="submit" variant="destructive" size="lg" disabled={deleting || confirmName !== site.name}>
           {t('siteSettings.deleteSite')}
         </Button>
       </div>

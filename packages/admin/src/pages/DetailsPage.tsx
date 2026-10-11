@@ -42,6 +42,8 @@ export default function DetailsPage() {
   const siteIndex = useMemo(() => new Map(sites.map((s, i) => [s.id, i])), [sites]);
 
   const [qInput, setQInput] = useState(filters.q);
+  // 输入法组字期间输入框里是拼音等中间态，不能当成搜索词
+  const [composing, setComposing] = useState(false);
   const [fromInput, setFromInput] = useState(filters.from);
   const [toInput, setToInput] = useState(filters.to);
 
@@ -59,11 +61,11 @@ export default function DetailsPage() {
 
   // 搜索防抖 300ms；依赖变化时清掉上一个定时器，卸载时同理
   useEffect(() => {
-    if (qInput.trim() === filters.q) return;
+    if (composing || qInput.trim() === filters.q) return;
     const timer = setTimeout(() => update({}), 300);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [qInput, filters.q]);
+    // update 每次渲染都是新函数，这里只关心输入内容、已生效的搜索词和组字状态
+  }, [qInput, filters.q, composing]);
 
   const enabled = Boolean(filters.from && filters.to);
   const query = usePageStats(
@@ -118,6 +120,7 @@ export default function DetailsPage() {
             <Search aria-hidden="true" className="pointer-events-none absolute left-3.5 top-3.5 size-4 text-muted-foreground" />
             <Input
               id="details-q" type="search" value={qInput} onChange={(e) => setQInput(e.target.value)}
+              onCompositionStart={() => setComposing(true)} onCompositionEnd={() => setComposing(false)}
               placeholder={t('details.searchPlaceholder')} className="h-11 rounded-xl bg-muted pl-10"
             />
           </div>

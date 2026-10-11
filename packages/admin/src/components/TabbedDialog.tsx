@@ -46,7 +46,11 @@ export function TabbedDialog<T extends string>({ open, onOpenChange, title, tabs
               <DialogTitle className="truncate text-base font-semibold">{title}</DialogTitle>
             </header>
             {tabs.map((tab) => (
-              <Tabs.Content key={tab.value} value={tab.value} className="min-h-0 flex-1 overflow-y-auto p-5 outline-none">
+              // forceMount：切走的分页只隐藏不卸载，没保存的输入不会丢
+              <Tabs.Content
+                key={tab.value} value={tab.value} forceMount hidden={tab.value !== value}
+                className="min-h-0 flex-1 overflow-y-auto p-5 outline-none"
+              >
                 {tab.content}
               </Tabs.Content>
             ))}

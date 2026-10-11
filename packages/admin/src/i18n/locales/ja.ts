@@ -24,6 +24,8 @@ const ja: MessageSchema = {
     menu: 'メニュー',
     more: 'その他',
     toggleTheme: 'ライト / ダークを切り替え',
+    unexpectedError: '問題が発生しました。',
+    reload: '再読み込み',
   },
   stats: {
     todayPv: '今日の PV',

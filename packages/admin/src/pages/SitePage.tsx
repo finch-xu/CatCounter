@@ -24,24 +24,44 @@ import { useFormat } from '@/hooks/useFormat';
 import { presetDates, type Range } from '@/lib/dateRange';
 import { dailyAverage, peakDay, share, sumSeries, withRatios } from '@/lib/metrics';
 import { cn } from '@/lib/utils';
-import { forgetSite, useOverview, useSite, useSiteStats } from '@/queries';
+import { forgetSite, useDeleteSite, useOverview, useSite, useSiteStats } from '@/queries';
 
 const DEVICE_COLORS = ['var(--brand)', 'var(--series-2)', 'var(--site-3)', 'var(--site-4)'];
 const DEVICE_ICONS = { desktop: Monitor, mobile: Smartphone, tablet: Tablet } as const;
 
-export default function SitePage() {
-  const { id = '' } = useParams();
-  // 换站点时用 key 重建，范围等本地状态回到默认值
-  return <SiteView key={id} id={id} />;
+interface Dates {
+  from: string;
+  to: string;
 }
 
-function SiteView({ id }: { id: string }) {
+/** 站点页的时间范围：applied 是已生效的起止日期，custom 是自定义输入框里还没点“查询”的值 */
+function useRangeState() {
+  const [range, setRange] = useState<Range>('30');
+  const [applied, setApplied] = useState<Dates>(() => presetDates('30'));
+  const [custom, setCustom] = useState<Dates>(applied);
+
+  function changeRange(next: Range) {
+    setRange(next);
+    // 切到自定义时沿用当前的起止日期，点“查询”才生效
+    if (next === 'custom') setCustom(applied);
+    else setApplied(presetDates(next));
+  }
+
+  return { range, applied, custom, setCustom, changeRange, applyCustom: () => setApplied(custom) };
+}
+
+export default function SitePage() {
+  const { id = '' } = useParams();
+  // 时间范围放在这一层：切换站点时沿用已选的范围；其余本地状态随 key 重建
+  const rangeState = useRangeState();
+  return <SiteView key={id} id={id} rangeState={rangeState} />;
+}
+
+function SiteView({ id, rangeState }: { id: string; rangeState: ReturnType<typeof useRangeState> }) {
   const { t } = useTranslation();
   const fmt = useFormat();
   const navigate = useNavigate();
-  const [range, setRange] = useState<Range>('30');
-  const [applied, setApplied] = useState(() => presetDates('30'));
-  const [custom, setCustom] = useState(applied);
+  const { range, applied, custom, setCustom, changeRange, applyCustom } = rangeState;
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const overview = useOverview();
@@ -51,13 +71,6 @@ function SiteView({ id }: { id: string }) {
   const index = Math.max(0, overview.data?.sites.findIndex((s) => s.id === id) ?? 0);
   const today = overview.data?.sites.find((s) => s.id === id)?.today;
 
-  function changeRange(next: Range) {
-    setRange(next);
-    // 切到自定义时沿用当前的起止日期，点“查询”才生效
-    if (next === 'custom') setCustom(applied);
-    else setApplied(presetDates(next));
-  }
-
   // 站点被删除后，等本页卸载再清它的缓存，避免还挂载着的查询去请求已删除的站点
   const queryClient = useQueryClient();
   const deleted = useRef(false);
@@ -65,11 +78,18 @@ function SiteView({ id }: { id: string }) {
     if (deleted.current) forgetSite(queryClient, id);
   }, [queryClient, id]);
 
-  function onDeleted() {
-    deleted.current = true;
-    setSettingsOpen(false);
-    toast(t('site.deleted'));
-    navigate('/', { replace: true });
+  // 删除由本页发起而不是弹窗里的分页：弹窗中途被关掉，结果回调也不会丢
+  const remove = useDeleteSite(id);
+  function deleteSite() {
+    remove.mutate(undefined, {
+      onSuccess: () => {
+        deleted.current = true;
+        setSettingsOpen(false);
+        toast(t('site.deleted'));
+        navigate('/', { replace: true });
+      },
+      onError: (e) => toast.error(e.message || t('common.operationFailed')),
+    });
   }
 
   if (site.isError && site.error instanceof ApiError && site.error.status === 404) {
@@ -116,7 +136,7 @@ function SiteView({ id }: { id: string }) {
           className="flex flex-wrap items-center gap-2"
           onSubmit={(e) => {
             e.preventDefault();
-            setApplied(custom);
+            applyCustom();
           }}
         >
           <Input
@@ -160,7 +180,9 @@ function SiteView({ id }: { id: string }) {
       )}
 
       {site.data && (
-        <SiteSettingsDialog site={site.data} open={settingsOpen} onOpenChange={setSettingsOpen} onDeleted={onDeleted} />
+        <SiteSettingsDialog
+          site={site.data} open={settingsOpen} onOpenChange={setSettingsOpen} onDelete={deleteSite} deleting={remove.isPending}
+        />
       )}
     </PageBody>
   );
