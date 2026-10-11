@@ -1,19 +1,16 @@
 import { readFileSync } from 'node:fs';
-import vue from '@vitejs/plugin-vue';
+import { fileURLToPath } from 'node:url';
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 const version = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')).version;
 
 export default defineConfig({
   base: '/admin/',
-  plugins: [vue()],
-  define: {
-    __APP_VERSION__: JSON.stringify(version),
-    // vue-i18n 的构建开关：只用 Composition API，关掉 legacy API 以便 tree-shaking
-    __VUE_I18N_FULL_INSTALL__: true,
-    __VUE_I18N_LEGACY_API__: false,
-    __INTLIFY_PROD_DEVTOOLS__: false,
-  },
+  plugins: [react(), tailwindcss()],
+  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
+  define: { __APP_VERSION__: JSON.stringify(version) },
   build: { outDir: '../worker/assets/admin', emptyOutDir: true },
   server: {
     proxy: {

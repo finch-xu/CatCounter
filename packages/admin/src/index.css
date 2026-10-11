@@ -1,0 +1,174 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* 深色：显式选了 dark，或跟随系统且系统为深色 */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) { @slot; }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) { @slot; }
+  }
+}
+
+@theme inline {
+  --font-sans: system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-serif: ui-serif, 'Iowan Old Style', Georgia, serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--brand);
+  --color-chart-2: var(--series-2);
+  --color-subtle: var(--subtle);
+  --color-grid: var(--grid);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-text: var(--brand-text);
+  --color-series-2: var(--series-2);
+  --color-series-2-soft: var(--series-2-soft);
+  --color-positive: var(--positive);
+  --color-positive-soft: var(--positive-soft);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --shadow-card: var(--shadow-card);
+}
+
+/* 暖纸色板；深色值在下面的两个块里各写一遍（显式选择 / 跟随系统） */
+:root {
+  --radius: 0.75rem;
+  --background: #f4f3ee;
+  --foreground: #1f1e1d;
+  --card: #ffffff;
+  --card-foreground: #1f1e1d;
+  --popover: #ffffff;
+  --popover-foreground: #1f1e1d;
+  --primary: #b9532f;
+  --primary-foreground: #ffffff;
+  --secondary: #e9e7e0;
+  --secondary-foreground: #1f1e1d;
+  --muted: #fbfaf7;
+  --muted-foreground: #6f6d66;
+  --accent: #f0eee8;
+  --accent-foreground: #1f1e1d;
+  --destructive: #c0392b;
+  --destructive-soft: #fbe9e7;
+  --border: #e6e4dd;
+  --input: #d9d6cd;
+  --ring: #d97757;
+  --subtle: #5e5d59;
+  --grid: #eeece6;
+  --brand: #d97757;
+  --brand-soft: #f8e9e2;
+  --brand-text: #a8472a;
+  --series-2: #2f5d7c;
+  --series-2-soft: #dfe8ee;
+  --positive: #2a6240;
+  --positive-soft: #e6f1e8;
+  --shadow-card: 0 1px 2px rgb(31 30 29 / 0.04);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --background: #1f1e1d;
+  --foreground: #edebe6;
+  --card: #2a2927;
+  --card-foreground: #edebe6;
+  --popover: #2a2927;
+  --popover-foreground: #edebe6;
+  --primary: #c8663f;
+  --primary-foreground: #ffffff;
+  --secondary: #33322f;
+  --secondary-foreground: #edebe6;
+  --muted: #252422;
+  --muted-foreground: #9a9891;
+  --accent: #33322f;
+  --accent-foreground: #edebe6;
+  --destructive: #e0796d;
+  --destructive-soft: #3d2320;
+  --border: #3a3936;
+  --input: #4a4945;
+  --ring: #d97757;
+  --subtle: #b5b3ac;
+  --grid: #33322f;
+  --brand: #d97757;
+  --brand-soft: #3f2c24;
+  --brand-text: #e8a48c;
+  --series-2: #7fb0cf;
+  --series-2-soft: #263845;
+  --positive: #8fc7a3;
+  --positive-soft: #22342a;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #1f1e1d;
+    --foreground: #edebe6;
+    --card: #2a2927;
+    --card-foreground: #edebe6;
+    --popover: #2a2927;
+    --popover-foreground: #edebe6;
+    --primary: #c8663f;
+    --primary-foreground: #ffffff;
+    --secondary: #33322f;
+    --secondary-foreground: #edebe6;
+    --muted: #252422;
+    --muted-foreground: #9a9891;
+    --accent: #33322f;
+    --accent-foreground: #edebe6;
+    --destructive: #e0796d;
+    --destructive-soft: #3d2320;
+    --border: #3a3936;
+    --input: #4a4945;
+    --ring: #d97757;
+    --subtle: #b5b3ac;
+    --grid: #33322f;
+    --brand: #d97757;
+    --brand-soft: #3f2c24;
+    --brand-text: #e8a48c;
+    --series-2: #7fb0cf;
+    --series-2-soft: #263845;
+    --positive: #8fc7a3;
+    --positive-soft: #22342a;
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3);
+    color-scheme: dark;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground font-sans text-sm antialiased;
+    line-height: 1.5;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
