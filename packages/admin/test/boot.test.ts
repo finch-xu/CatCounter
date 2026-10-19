@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import css from '../src/index.css?raw';
 import html from '../index.html?raw';
 
-const bootScript = html.match(/<script>([\s\S]*?)<\/script>/)?.[1] ?? '';
+const bootScript = new DOMParser().parseFromString(html, 'text/html').querySelector('script:not([src])')?.textContent ?? '';
 const run = () => new Function(bootScript)();
 const theme = () => document.documentElement.getAttribute('data-theme');
 
